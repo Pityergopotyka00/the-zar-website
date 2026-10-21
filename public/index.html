@@ -484,7 +484,13 @@
         button.textContent = "PRE-REGISTER ↗";
       }
     });
-  </script>
-</body>
-</html>
+<script>
+  // Default launch status until the admin panel sets a release date.
+  const launchStatus = document.getElementById("launch-countdown");
 
+  if (launchStatus) {
+    launchStatus.textContent = "LAUNCHING SOON";
+  }
+</script>
+</body>
+</html>    

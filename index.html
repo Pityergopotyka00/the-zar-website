@@ -4,38 +4,487 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>The ZAR — Coming Soon</title>
+  <meta name="theme-color" content="#090a0e">
+  <meta name="description" content="The ZAR — a new gaming experience is coming soon. Join the pre-registration list for launch updates.">
+  <title>The ZAR — Official Website</title>
   <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090a0e;
+      --panel: #111319;
+      --text: #f4f5f8;
+      --muted: #9297a5;
+      --line: rgba(255,255,255,.1);
+      --accent: #d5ff65;
+    }
+
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      font-family: Arial, sans-serif;
-      color: white;
-      text-align: center;
-      background: radial-gradient(ellipse at top, #193d70, #080b14 65%);
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-    main { padding: 30px 20px; }
-    h1 { font-size: clamp(55px, 12vw, 100px); margin: 0; letter-spacing: 8px; }
-    p { color: #b8c8e5; font-size: 18px; }
-    .status { color: #65d7ff; letter-spacing: 4px; font-size: 12px; }
-    a {
-      display: inline-block; margin-top: 20px; padding: 15px 28px;
-      background: linear-gradient(90deg, #2688ff, #bd55ff);
-      border-radius: 8px; color: white; text-decoration: none;
-      font-weight: bold;
+    a { color: inherit; }
+    .wrap { width: min(1120px, calc(100% - 40px)); margin: auto; }
+    header {
+      height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: 5px;
+      text-decoration: none;
+    }
+    .brand span { color: var(--accent); }
+    nav { display: flex; align-items: center; gap: 28px; }
+    nav a {
+      color: #c3c5cd;
+      font-size: 13px;
+      text-decoration: none;
+    }
+    nav a:hover { color: white; }
+    .nav-cta {
+      padding: 11px 15px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+    }
+
+    .hero {
+      min-height: 640px;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      align-items: center;
+      gap: 55px;
+      padding-top: 70px;
+      padding-bottom: 70px;
+    }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 15px #d5ff6580;
+    }
+    h1 {
+      margin: 25px 0 18px;
+      font-size: clamp(64px, 10vw, 116px);
+      letter-spacing: -.085em;
+      line-height: .88;
+      font-weight: 950;
+    }
+    h1 span { color: var(--accent); }
+    .intro {
+      max-width: 480px;
+      color: #a7abb8;
+      font-size: 17px;
+      line-height: 1.8;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+    .btn {
+      min-height: 48px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 13px;
+      transition: transform .2s, opacity .2s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .primary { background: var(--accent); color: #11140b; border: 0; cursor: pointer; }
+    .secondary { border: 1px solid var(--line); color: white; }
+
+    .showcase {
+      min-height: 390px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      padding: 26px;
+      border: 1px solid #ffffff18;
+      border-radius: 10px;
+      background:
+        radial-gradient(ellipse at 72% 25%, #d5ff6520, transparent 36%),
+        radial-gradient(ellipse at 15% 100%, #526b8a24, transparent 48%),
+        linear-gradient(145deg, #20242c, #101116 62%);
+    }
+    .showcase::before {
+      content: "Z";
+      position: absolute;
+      top: -55px;
+      right: -8px;
+      font-size: 330px;
+      line-height: 1;
+      font-weight: 950;
+      letter-spacing: -.12em;
+      color: #ffffff06;
+      transform: rotate(-9deg);
+    }
+    .showcase::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(0deg, #090a0ef0, transparent 75%);
+    }
+    .showcase-content { position: relative; z-index: 1; }
+    .showcase-label {
+      color: var(--accent);
+      font-size: 10px;
+      letter-spacing: 3px;
+      font-weight: 800;
+    }
+    .showcase h2 { font-size: 29px; margin: 10px 0; }
+    .showcase p { color: #b3b6c0; font-size: 13px; line-height: 1.7; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .stat { padding: 27px 20px; border-right: 1px solid var(--line); }
+    .stat:first-child { padding-left: 0; }
+    .stat:last-child { border-right: 0; }
+    .stat strong { display: block; font-size: 15px; }
+    .stat span { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; }
+
+    section.content { padding-top: 100px; padding-bottom: 100px; }
+    .section-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .section-top h2 {
+      margin: 12px 0 0;
+      font-size: clamp(32px, 5vw, 48px);
+      letter-spacing: -.055em;
+    }
+    .section-top p {
+      max-width: 360px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+    .feature {
+      min-height: 190px;
+      padding: 25px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .feature-number { color: var(--accent); font-size: 11px; letter-spacing: 2px; }
+    .feature h3 { margin: 30px 0 10px; font-size: 18px; }
+    .feature p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.8; }
+
+    .signup {
+      display: grid;
+      grid-template-columns: 1fr .8fr;
+      gap: 45px;
+      align-items: center;
+      padding: 40px;
+      background:
+        radial-gradient(ellipse at 0 100%, #d5ff6510, transparent 50%),
+        #111319;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .signup h2 { margin: 15px 0; font-size: clamp(30px, 5vw, 47px); letter-spacing: -.06em; }
+    .signup-copy { color: var(--muted); font-size: 14px; line-height: 1.8; }
+    form { display: grid; gap: 12px; }
+    input[type="email"] {
+      width: 100%;
+      min-height: 49px;
+      padding: 0 15px;
+      color: white;
+      background: #090a0e;
+      border: 1px solid #343742;
+      border-radius: 5px;
+      font: inherit;
+      outline: none;
+    }
+    input[type="email"]:focus { border-color: var(--accent); }
+    .consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: #b1b4bf;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+    .consent input { margin-top: 4px; accent-color: var(--accent); }
+    .fineprint { color: #858a98; font-size: 11px; line-height: 1.7; }
+    #form-status { min-height: 20px; font-size: 13px; line-height: 1.6; }
+    .success { color: var(--accent); }
+    .error { color: #ff9c9c; }
+    button:disabled { opacity: .6; cursor: wait; }
+
+    footer {
+      padding: 27px 0;
+      border-top: 1px solid var(--line);
+      color: #858a98;
+      font-size: 12px;
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    .footer-links { display: flex; gap: 18px; }
+    .footer-links a { text-decoration: none; }
+
+    @media (max-width: 760px) {
+      .wrap { width: min(100% - 30px, 560px); }
+      header { height: 70px; }
+      nav { gap: 14px; }
+      nav a:not(.nav-cta) { display: none; }
+      .hero { grid-template-columns: 1fr; gap: 35px; padding-top: 65px; }
+      .showcase { min-height: 300px; }
+      .stats { grid-template-columns: 1fr; }
+      .stat, .stat:first-child { padding: 18px 0; border-right: 0; border-bottom: 1px solid var(--line); }
+      .stat:last-child { border-bottom: 0; }
+      section.content { padding-top: 70px; padding-bottom: 70px; }
+      .section-top { display: block; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature { min-height: 150px; }
+      .feature h3 { margin-top: 22px; }
+      .signup { grid-template-columns: 1fr; gap: 25px; padding: 24px; }
+      .footer-inner { align-items: flex-start; flex-direction: column; }
     }
   </style>
 </head>
 <body>
+  <header class="wrap">
+    <a class="brand" href="#" aria-label="The ZAR home">THE <span>ZAR</span></a>
+    <nav aria-label="Main navigation">
+      <a href="#about">About</a>
+      <a href="#features">Experience</a>
+      <a class="nav-cta" href="#register">Pre-register ↗</a>
+    </nav>
+  </header>
+
   <main>
-    <div class="status">AN EXCLUSIVE NEW EXPERIENCE</div>
-    <h1>THE ZAR</h1>
-    <p>Something big is coming.</p>
-    <p>Prepare yourself. The launch date is still to be announced.</p>
-    <a href="#" onclick="alert('Pre-registration is coming soon!'); return false;">PRE-REGISTER SOON</a>
+    <section class="hero wrap">
+      <div>
+        <div class="eyebrow"><span class="dot"></span> A NEW EXPERIENCE AWAITS</div>
+        <h1>THE<br><span>ZAR.</span></h1>
+        <p class="intro">
+          A new experience is on the horizon. Get ready to step into
+          The ZAR and be among the first to hear when the doors open.
+        </p>
+        <div class="actions">
+          <a class="btn primary" href="#register">JOIN THE PRE-LAUNCH ↗</a>
+          <a class="btn secondary" href="#about">DISCOVER THE ZAR</a>
+        </div>
+      </div>
+
+      <div class="showcase" role="img" aria-label="Abstract dark ZAR game showcase">
+        <div class="showcase-content">
+          <div class="showcase-label">PROJECT ZAR / 001</div>
+          <h2>The next chapter starts here.</h2>
+          <p>Built for the players. Made to be remembered.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="stats wrap" id="about">
+      <div class="stat">
+        <strong>COMING SOON</strong>
+        <span>Launch date to be announced</span>
+      </div>
+      <div class="stat">
+        <strong>THE ZAR</strong>
+        <span>A new gaming experience</span>
+      </div>
+      <div class="stat">
+        <strong>BE FIRST</strong>
+        <span>Get launch updates by email</span>
+      </div>
+    </div>
+
+    <section class="content wrap" id="features">
+      <div class="section-top">
+        <div>
+          <div class="eyebrow">WHAT'S AHEAD</div>
+          <h2>Made for the<br>next generation.</h2>
+        </div>
+        <p>
+          The ZAR is in development. Join the list to receive official
+          announcements as more details become available.
+        </p>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature">
+          <div class="feature-number">01 / THE WORLD</div>
+          <h3>A new experience</h3>
+          <p>Discover what's being built and get ready for the reveal.</p>
+        </article>
+        <article class="feature">
+          <div class="feature-number">02 / THE COMMUNITY</div>
+          <h3>Be part of the beginning</h3>
+          <p>Get important news directly from The ZAR team.</p>
+        </article>
+        <article class="feature">
+          <div class="feature-number">03 / THE LAUNCH</div>
+          <h3>Know when it drops</h3>
+          <p>Receive a launch announcement when the release is ready.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="content wrap" id="register">
+      <div class="signup">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> YOUR INVITATION STARTS HERE</div>
+          <h2>Don't miss<br>the launch.</h2>
+          <p class="signup-copy">
+            Register your email to receive a confirmation and optional
+            launch updates. No release date has been announced yet.
+          </p>
+        </div>
+
+        <div>
+          <form id="signup-form">
+            <label for="email">Your email address</label>
+            <input id="email" name="email" type="email"
+              placeholder="you@example.com" autocomplete="email"
+              maxlength="254" required>
+
+            <label class="consent">
+              <input type="checkbox" id="consent" required>
+              <span>I agree to receive The ZAR launch updates by email.
+                I can unsubscribe at any time. See the privacy notice below.</span>
+            </label>
+
+            <div style="position:absolute;left:-10000px" aria-hidden="true">
+              <label for="website">Leave this field empty</label>
+              <input id="website" name="website" tabindex="-1" autocomplete="off">
+            </div>
+
+            <button class="btn primary" id="submit-button" type="submit">
+              PRE-REGISTER ↗
+            </button>
+            <p id="form-status" role="status" aria-live="polite"></p>
+            <p class="fineprint">
+              Your email will only be used for the updates you request.
+              Registration is not a purchase or a guarantee of early access.
+            </p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" style="padding-bottom:65px">
+      <div class="section-top">
+        <div>
+          <div class="eyebrow">YOUR DATA</div>
+          <h2 style="font-size:27px">Privacy notice</h2>
+        </div>
+      </div>
+      <p class="fineprint" style="max-width:760px">
+        The ZAR pre-registration is intended to collect an email address
+        and your email-update consent for launch communications. We will
+        need to publish the operator's contact details, retention period,
+        deletion/unsubscribe process and full privacy information before
+        opening registrations publicly. Do not submit sensitive information.
+      </p>
+    </section>
   </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <a class="brand" href="#" style="font-size:14px">THE <span>ZAR</span></a>
+      <span>© <span id="year"></span> The ZAR. All rights reserved.</span>
+      <div class="footer-links">
+        <a href="#register">Pre-register</a>
+        <a href="#about">About</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const form = document.getElementById("signup-form");
+    const button = document.getElementById("submit-button");
+    const status = document.getElementById("form-status");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      status.className = "";
+      status.textContent = "";
+
+      if (!form.reportValidity()) return;
+
+      // Honeypot: real visitors leave this field empty.
+      if (document.getElementById("website").value) return;
+
+      button.disabled = true;
+      button.textContent = "PLEASE WAIT…";
+
+      try {
+        const response = await fetch("/api/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: document.getElementById("email").value.trim(),
+            consent: document.getElementById("consent").checked,
+            website: document.getElementById("website").value
+          })
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(result.error || "Registration is not available yet. Please try again later.");
+        }
+
+        status.className = "success";
+        status.textContent = result.message ||
+          "Check your inbox for the confirmation email.";
+        form.reset();
+      } catch (error) {
+        status.className = "error";
+        status.textContent = error.message ||
+          "Something went wrong. Please try again later.";
+      } finally {
+        button.disabled = false;
+        button.textContent = "PRE-REGISTER ↗";
+      }
+    });
+  </script>
 </body>
 </html>

@@ -694,7 +694,7 @@ $("#saveGameChecklist").addEventListener("click", () => {
   toast("Setup checklist saved in this browser.");
 });
 $("#copyGameEndpoints").addEventListener("click", async () => {
-  const text = "THE ZAR API endpoints\\nGET https://the-zar-website.klucsik-marton2.workers.dev/api/game/config\\nPOST https://the-zar-website.klucsik-marton2.workers.dev/api/game/redeem\\nAuthorization: Bearer YOUR_GAME_API_KEY";
+  const text = ["THE ZAR API endpoints","GET https://the-zar-website.klucsik-marton2.workers.dev/api/game/config","POST https://the-zar-website.klucsik-marton2.workers.dev/api/game/redeem","Authorization: Bearer YOUR_GAME_API_KEY"].join("\n");
   try { await navigator.clipboard.writeText(text); toast("API endpoints copied."); }
   catch { toast("Clipboard access failed."); }
 });

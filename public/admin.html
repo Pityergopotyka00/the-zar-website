@@ -65,6 +65,7 @@ code{font-size:11px;color:#9bdfff;overflow-wrap:anywhere}
 .pill{display:inline-block;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.5px;background:#283249;color:#d5def0}
 .pill.active,.pill.paid,.pill.fulfilled{background:#12392e;color:#7ce8bb}.pill.pending{background:#3c3017;color:var(--warn)}.pill.disabled,.pill.cancelled,.pill.refunded{background:#401b2a;color:#ff9caf}
 .empty{padding:30px;text-align:center;color:var(--muted)}
+.setup-steps{border-top:1px solid var(--line);padding-top:16px}.setup-check{display:flex;align-items:flex-start;gap:11px;padding:12px;border:1px solid var(--line);border-radius:12px;margin:9px 0;background:#ffffff04;cursor:pointer}.setup-check input{margin-top:4px;accent-color:var(--accent);width:17px;height:17px;flex:0 0 auto}.setup-check span{display:grid;gap:3px}.setup-check small{color:var(--muted);font-size:12px}.badge{border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--accent2);font-size:12px;white-space:nowrap}
 .notice{padding:13px 15px;background:#1c1b32;border:1px solid #494078;border-radius:10px;color:#d4d5ff;font-size:12px;margin-top:14px}
 pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#090e19;border:1px solid var(--line);padding:14px;border-radius:10px;color:#b8c9f4;font-size:12px}
 .toast{position:fixed;right:24px;bottom:24px;background:#171f30;border:1px solid #526181;padding:13px 17px;border-radius:12px;z-index:20;max-width:360px;box-shadow:0 12px 40px #0009}
@@ -302,8 +303,17 @@ Content-Type: application/json
 {
   "code": "ZAR-ABCDE-FGHIJ"
 }</pre>
-          <div class="notice">Keep the API key inside a Roblox server Script or secure server configuration. Never expose it in a LocalScript, GUI, or replicated storage.</div>
-          <div class="actions"><button class="btn" id="refreshGame">Check integration</button><span id="gameStatus" class="muted small"></span></div>
+          <div class="notice">Your Cloudflare secret is never displayed here. Roblox server scripts must send it as a Bearer token. Never put it in a LocalScript, GUI, or ReplicatedStorage.</div>
+          <div class="actions"><button class="btn" id="refreshGame">Refresh setup status</button><span id="gameStatus" class="muted small"></span></div>
+          <div class="setup-steps" style="margin-top:18px">
+            <div class="section-head"><div><h2>Connection setup</h2><p>Follow these steps to connect your published Roblox experience</p></div><span id="gameSetupProgress" class="badge">0 / 4</span></div>
+            <label class="setup-check"><input type="checkbox" id="gameStepSecret"> <span><strong>Step 1 — Worker secret</strong><small>Add <code>GAME_API_KEY</code> in Cloudflare Worker settings. It must stay private.</small></span></label>
+            <label class="setup-check"><input type="checkbox" id="gameStepHttp"> <span><strong>Step 2 — Enable HTTP requests</strong><small>In Roblox Studio, open Game Settings → Security → enable Allow HTTP Requests.</small></span></label>
+            <label class="setup-check"><input type="checkbox" id="gameStepScript"> <span><strong>Step 3 — Add the server script</strong><small>Put the integration Script inside ServerScriptService, never a LocalScript.</small></span></label>
+            <label class="setup-check"><input type="checkbox" id="gameStepTest"> <span><strong>Step 4 — Test with a real code</strong><small>Create a test code below in Codes or Giveaway Codes, then redeem it in a private test server.</small></span></label>
+            <div class="actions"><button class="btn" type="button" id="copyGameEndpoints">Copy API endpoints</button><button class="btn" type="button" id="copyGameScriptLink">Copy server script link</button><button class="btn btn-red" type="button" id="saveGameChecklist">Save checklist</button></div>
+            <p class="muted small">Checklist items are saved in this browser only. “Secret configured” confirms Cloudflare has a secret with that name; it does not prove Roblox can connect yet.</p>
+          </div>
         </div>
         <div class="card">
           <div class="section-head"><div><h2>Roblox Setup</h2><p>Configure how players enter THE ZAR</p></div></div>
@@ -662,6 +672,37 @@ async function loadRegistrations() {
     </tbody></table>`;
 }
 $("#reloadRegs").addEventListener("click", () => loadRegistrations().catch(e => toast(e.message)));
+
+const gameChecklistIds = ["gameStepSecret","gameStepHttp","gameStepScript","gameStepTest"];
+function updateGameChecklist() {
+  const done = gameChecklistIds.filter(id => $("#"+id)?.checked).length;
+  $("#gameSetupProgress").textContent = done + " / " + gameChecklistIds.length;
+}
+gameChecklistIds.forEach(id => {
+  const el = $("#"+id);
+  if (!el) return;
+  el.checked = localStorage.getItem("zar_"+id) === "1";
+  el.addEventListener("change", () => {
+    localStorage.setItem("zar_"+id, el.checked ? "1" : "0");
+    updateGameChecklist();
+  });
+});
+updateGameChecklist();
+$("#saveGameChecklist").addEventListener("click", () => {
+  gameChecklistIds.forEach(id => localStorage.setItem("zar_"+id, $("#"+id).checked ? "1" : "0"));
+  updateGameChecklist();
+  toast("Setup checklist saved in this browser.");
+});
+$("#copyGameEndpoints").addEventListener("click", async () => {
+  const text = "THE ZAR API endpoints\\nGET https://the-zar-website.klucsik-marton2.workers.dev/api/game/config\\nPOST https://the-zar-website.klucsik-marton2.workers.dev/api/game/redeem\\nAuthorization: Bearer YOUR_GAME_API_KEY";
+  try { await navigator.clipboard.writeText(text); toast("API endpoints copied."); }
+  catch { toast("Clipboard access failed."); }
+});
+$("#copyGameScriptLink").addEventListener("click", async () => {
+  const text = "https://github.com/Pityergopotyka00/the-zar-website/blob/main/roblox/TheZARCodeRedeem.server.lua";
+  try { await navigator.clipboard.writeText(text); toast("Server script link copied."); }
+  catch { toast("Clipboard access failed."); }
+});
 
 async function loadGame() {
   const [data, settings] = await Promise.all([

@@ -2,966 +2,1401 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#080909">
-<meta name="description" content="The ZAR. A new gaming experience is coming. Join the community before launch.">
-<title>THE ZAR® — Enter The Next Era</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090909">
+  <meta name="description" content="THE ZAR — A new era of tactical FPS combat. Join the pre-registration list and prepare for launch.">
+  <title>THE ZAR — Enter the Battlefield</title>
 
-<style>
-:root {
-  color-scheme: dark;
-  --bg: #080909;
-  --panel: #101310;
-  --panel2: #151a15;
-  --lime: #c7ff65;
-  --lime2: #8dff45;
-  --white: #f6f8f3;
-  --muted: #92988f;
-  --line: rgba(255,255,255,.10);
-  --max: 1240px;
-}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 90px; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--white);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", sans-serif;
-  overflow-x: hidden;
-}
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: -1;
-  background:
-    radial-gradient(ellipse at 12% 8%, #a6ff6710, transparent 36%),
-    radial-gradient(ellipse at 88% 40%, #76ff4510, transparent 34%);
-}
-a { color: inherit; text-decoration: none; }
-button, input { font: inherit; }
-button, a { -webkit-tap-highlight-color: transparent; }
-button:focus-visible, a:focus-visible, input:focus-visible {
-  outline: 2px solid var(--lime);
-  outline-offset: 4px;
-}
-.wrap { width: min(var(--max), calc(100% - 48px)); margin-inline: auto; }
+  <style>
+    :root {
+      --bg: #090909;
+      --panel: #111111;
+      --panel-2: #171717;
+      --red: #ed252e;
+      --red-bright: #ff3942;
+      --white: #f5f5f5;
+      --muted: #898989;
+      --line: rgba(255,255,255,.09);
+      --max: 1200px;
+    }
 
-/* NAVIGATION */
-header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: #080909d9;
-  backdrop-filter: blur(18px);
-  border-bottom: 1px solid var(--line);
-}
-.nav {
-  min-height: 78px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 1000;
-  letter-spacing: 3px;
-  font-size: 20px;
-}
-.brand-symbol {
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-  background: var(--lime);
-  color: #080909;
-  border-radius: 7px;
-  font-weight: 1000;
-  transform: skew(-7deg);
-}
-.brand span:last-child { color: var(--lime); }
-.nav-links { display: flex; align-items: center; gap: 30px; }
-.nav-links a {
-  color: #aeb4a9;
-  font-size: 12px;
-  font-weight: 750;
-  transition: color .2s;
-}
-.nav-links a:hover { color: var(--lime); }
-.nav-cta, .button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 46px;
-  padding: 0 19px;
-  background: var(--lime);
-  color: #10140b;
-  border: 1px solid var(--lime);
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 950;
-  letter-spacing: .4px;
-  transition: transform .2s, background .2s, box-shadow .2s;
-  cursor: pointer;
-}
-.nav-cta:hover, .button:hover {
-  transform: translateY(-2px);
-  background: #d9ff9d;
-  box-shadow: 0 8px 30px #c7ff6520;
-}
-.button-outline {
-  background: #ffffff06;
-  border-color: #ffffff25;
-  color: var(--white);
-}
-.button-outline:hover {
-  background: #ffffff10;
-  border-color: var(--lime);
-  box-shadow: none;
-}
+    * { box-sizing: border-box; }
 
-/* HERO */
-.hero {
-  min-height: 690px;
-  padding-top: 78px;
-  padding-bottom: 88px;
-  display: grid;
-  grid-template-columns: 1.08fr .92fr;
-  align-items: center;
-  gap: 42px;
-  position: relative;
-}
-.hero-copy { position: relative; z-index: 2; }
-.kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--lime);
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-}
-.live-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--lime);
-  box-shadow: 0 0 14px var(--lime);
-  animation: pulse 2s infinite;
-}
-@keyframes pulse {
-  0%,100% { opacity: 1; box-shadow: 0 0 14px var(--lime); }
-  50% { opacity: .55; box-shadow: 0 0 3px var(--lime); }
-}
-.hero h1 {
-  margin: 28px 0 20px;
-  font-size: clamp(78px, 11.3vw, 150px);
-  line-height: .78;
-  letter-spacing: -.105em;
-  font-weight: 1000;
-}
-.hero h1 .outline {
-  display: block;
-  color: transparent;
-  -webkit-text-stroke: 1.5px #e8f2e4;
-  margin-top: 14px;
-}
-.hero h1 .lime { color: var(--lime); }
-.hero-description {
-  max-width: 470px;
-  margin: 30px 0 0;
-  color: #a4aaa0;
-  font-size: 15px;
-  line-height: 1.9;
-}
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 28px;
-}
-.hero-note {
-  margin-top: 20px;
-  color: #72796f;
-  font-size: 10px;
-  letter-spacing: 1.1px;
-}
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
 
-/* CSS-ONLY GAME ART */
-.hero-art {
-  min-height: 480px;
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  place-items: center;
-}
-.art-grid {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  background-image:
-    linear-gradient(#c7ff6510 1px, transparent 1px),
-    linear-gradient(90deg, #c7ff6510 1px, transparent 1px);
-  background-size: 34px 34px;
-  mask-image: radial-gradient(ellipse, black 12%, transparent 74%);
-  transform: perspective(600px) rotateX(8deg);
-}
-.art-glow {
-  position: absolute;
-  width: 75%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: #a5ff4514;
-  filter: blur(65px);
-  animation: breathe 5s ease-in-out infinite;
-}
-@keyframes breathe {
-  0%,100% { transform: scale(.85); opacity: .5; }
-  50% { transform: scale(1.15); opacity: 1; }
-}
-.art-ring {
-  position: absolute;
-  width: 90%;
-  aspect-ratio: 1;
-  border: 1px solid #c7ff6524;
-  border-radius: 50%;
-  transform: rotate(-25deg) scaleY(.42);
-}
-.art-ring.two {
-  width: 73%;
-  transform: rotate(35deg) scaleY(.42);
-  border-color: #ffffff25;
-}
-.art-ring.three {
-  width: 56%;
-  transform: rotate(-55deg) scaleY(.42);
-  border-color: #c7ff6550;
-}
-.art-core {
-  width: min(72%, 330px);
-  aspect-ratio: .83;
-  position: relative;
-  display: grid;
-  place-items: center;
-  clip-path: polygon(0 13%, 70% 0, 100% 15%, 88% 83%, 25% 100%, 7% 73%);
-  background:
-    linear-gradient(135deg, #c7ff6540, transparent 35%),
-    linear-gradient(145deg, #303a2a, #111510 55%, #20271d);
-  border: 1px solid #c7ff6560;
-  filter: drop-shadow(0 0 50px #c7ff6525);
-  transform: rotate(-5deg);
-}
-.art-core::before {
-  content: "";
-  position: absolute;
-  inset: 12px;
-  clip-path: polygon(0 13%, 70% 0, 100% 15%, 88% 83%, 25% 100%, 7% 73%);
-  border: 1px solid #c7ff6550;
-  background: repeating-linear-gradient(
-    135deg, transparent 0 16px, #c7ff6509 17px 18px
-  );
-}
-.art-z {
-  font-size: clamp(150px, 23vw, 290px);
-  font-weight: 1000;
-  letter-spacing: -.15em;
-  line-height: 1;
-  padding-right: .15em;
-  color: var(--lime);
-  text-shadow: 0 0 65px #c7ff6540;
-  transform: skew(-8deg);
-}
-.art-label {
-  position: absolute;
-  padding: 12px 14px;
-  background: #0b0e0bd9;
-  border: 1px solid #ffffff20;
-  backdrop-filter: blur(10px);
-  border-radius: 6px;
-}
-.art-label small {
-  display: block;
-  color: #879080;
-  font-size: 9px;
-  letter-spacing: 2px;
-}
-.art-label strong {
-  display: block;
-  margin-top: 5px;
-  font-size: 12px;
-  letter-spacing: 1px;
-}
-.art-label.top { top: 48px; right: 0; }
-.art-label.bottom { bottom: 42px; left: 0; }
-.art-label strong em { color: var(--lime); font-style: normal; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--white);
+      font-family: Inter, sans-serif;
+      overflow-x: hidden;
+    }
 
-/* STRIP */
-.ticker {
-  overflow: hidden;
-  border-block: 1px solid var(--line);
-  background: #ffffff03;
-}
-.ticker-inner {
-  min-height: 57px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 22px;
-  color: #a6ada0;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 2px;
-}
-.ticker b { color: var(--lime); }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+      opacity: .12;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.13'/%3E%3C/svg%3E");
+    }
 
-/* SECTION STYLES */
-.section { padding-top: 110px; padding-bottom: 110px; }
-.section-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 30px;
-  margin-bottom: 42px;
-}
-.section-tag {
-  color: var(--lime);
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 3px;
-}
-.section-head h2 {
-  margin: 14px 0 0;
-  font-size: clamp(38px, 6vw, 66px);
-  line-height: .98;
-  letter-spacing: -.075em;
-  font-weight: 950;
-}
-.section-head h2 span { color: var(--lime); }
-.section-head p {
-  max-width: 365px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.9;
-}
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
 
-/* COUNTDOWN */
-.launch-panel {
-  position: relative;
-  overflow: hidden;
-  padding: 34px;
-  background:
-    radial-gradient(ellipse at 100% 0%, #c7ff6515, transparent 45%),
-    linear-gradient(130deg, #141914, #0c0e0c);
-  border: 1px solid #c7ff652d;
-  border-radius: 12px;
-}
-.launch-panel::after {
-  content: "Z";
-  position: absolute;
-  top: -65px;
-  right: 30px;
-  font-size: 280px;
-  line-height: 1;
-  color: #ffffff04;
-  font-weight: 1000;
-  pointer-events: none;
-}
-.launch-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  position: relative;
-  z-index: 1;
-}
-.launch-title {
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 2px;
-}
-.launch-state {
-  color: var(--lime);
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 2px;
-}
-.countdown {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-top: 34px;
-  position: relative;
-  z-index: 1;
-}
-.time-unit {
-  padding: 22px 10px;
-  background: #0709078c;
-  border: 1px solid #ffffff10;
-  border-radius: 8px;
-  text-align: center;
-}
-.time-unit strong {
-  display: block;
-  font-size: clamp(28px, 5vw, 54px);
-  letter-spacing: -.07em;
-  font-variant-numeric: tabular-nums;
-}
-.time-unit span {
-  display: block;
-  margin-top: 9px;
-  color: #858d7e;
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 2px;
-}
-.launch-caption {
-  position: relative;
-  z-index: 1;
-  margin: 20px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-}
+    .wrap {
+      width: min(var(--max), calc(100% - 48px));
+      margin-inline: auto;
+    }
 
-/* FEATURES */
-.features {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-.feature {
-  position: relative;
-  min-height: 280px;
-  padding: 27px;
-  overflow: hidden;
-  background: linear-gradient(145deg, #151915, #0e100e);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  transition: transform .25s, border-color .25s;
-}
-.feature:hover {
-  transform: translateY(-5px);
-  border-color: #c7ff6570;
-}
-.feature::after {
-  content: "";
-  position: absolute;
-  right: -40px;
-  top: -40px;
-  width: 150px;
-  height: 150px;
-  border: 1px solid #c7ff6512;
-  border-radius: 50%;
-  box-shadow: 0 0 0 20px #c7ff6504, 0 0 0 40px #c7ff6503;
-}
-.feature-icon {
-  width: 48px;
-  height: 48px;
-  display: grid;
-  place-items: center;
-  border-radius: 9px;
-  background: #c7ff6510;
-  border: 1px solid #c7ff6530;
-  color: var(--lime);
-  font-size: 21px;
-}
-.feature-number {
-  margin-top: 28px;
-  color: #818a7b;
-  font-size: 9px;
-  letter-spacing: 2px;
-  font-weight: 900;
-}
-.feature h3 {
-  margin: 10px 0;
-  font-size: 21px;
-  letter-spacing: -.6px;
-}
-.feature p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.9;
-}
+    .red { color: var(--red); }
+    .muted { color: var(--muted); }
 
-/* PRE-REGISTRATION */
-.signup-section {
-  position: relative;
-  padding: 65px 0;
-}
-.signup {
-  display: grid;
-  grid-template-columns: 1fr .85fr;
-  align-items: center;
-  gap: 55px;
-  padding: clamp(26px, 5vw, 60px);
-  position: relative;
-  overflow: hidden;
-  border: 1px solid #c7ff6535;
-  border-radius: 13px;
-  background:
-    radial-gradient(ellipse at 0 100%, #c7ff6518, transparent 45%),
-    radial-gradient(ellipse at 100% 0, #c7ff650c, transparent 35%),
-    #101310;
-}
-.signup h2 {
-  margin: 17px 0;
-  font-size: clamp(39px, 6vw, 68px);
-  line-height: .95;
-  letter-spacing: -.08em;
-}
-.signup h2 span { color: var(--lime); }
-.signup-copy {
-  max-width: 430px;
-  color: #a1a99b;
-  font-size: 13px;
-  line-height: 1.9;
-}
-.signup-form {
-  display: grid;
-  gap: 14px;
-}
-.signup-form label.main-label {
-  color: #d7ddd2;
-  font-size: 11px;
-  font-weight: 800;
-}
-.signup-form input[type="email"] {
-  width: 100%;
-  min-height: 52px;
-  padding: 0 15px;
-  color: white;
-  background: #080a08;
-  border: 1px solid #343b31;
-  border-radius: 6px;
-  outline: none;
-}
-.signup-form input[type="email"]:focus { border-color: var(--lime); }
-.consent {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  color: #9ca494;
-  font-size: 10px;
-  line-height: 1.8;
-}
-.consent input { margin-top: 4px; accent-color: var(--lime); }
-.signup-form button { width: 100%; }
-.form-status { min-height: 20px; margin: 0; font-size: 12px; line-height: 1.6; }
-.success { color: var(--lime); }
-.error { color: #ff9999; }
-.fineprint { color: #777f72; font-size: 10px; line-height: 1.8; }
-button:disabled { opacity: .6; cursor: wait; }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: #c7c7c7;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
 
-/* FOOTER */
-footer { border-top: 1px solid var(--line); }
-.footer-main {
-  padding: 38px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 30px;
-}
-.footer-note { color: #81897c; font-size: 11px; line-height: 1.8; }
-.footer-links { display: flex; gap: 22px; flex-wrap: wrap; }
-.footer-links a { color: #a3aa9d; font-size: 11px; }
-.footer-links a:hover { color: var(--lime); }
-.footer-bottom {
-  padding: 17px 0;
-  border-top: 1px solid var(--line);
-  color: #666e61;
-  font-size: 10px;
-  letter-spacing: .4px;
-}
-.footer-bottom .wrap {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-}
+    .eyebrow::before {
+      content: "";
+      width: 24px;
+      height: 2px;
+      background: var(--red);
+    }
 
-/* ANIMATION */
-.reveal {
-  animation: rise .75s cubic-bezier(.2,.7,.2,1) both;
-}
-@keyframes rise {
-  from { opacity: 0; transform: translateY(22px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-    transition-duration: .01ms !important;
-  }
-}
+    h1, h2, h3, p { margin-top: 0; }
 
-/* RESPONSIVE */
-@media (max-width: 850px) {
-  .hero { grid-template-columns: 1fr; padding-top: 65px; gap: 10px; }
-  .hero-art { min-height: 410px; }
-  .hero h1 { font-size: clamp(84px, 18vw, 140px); }
-  .section { padding-top: 78px; padding-bottom: 78px; }
-  .section-head { align-items: flex-start; flex-direction: column; gap: 12px; }
-  .features { grid-template-columns: 1fr 1fr; }
-  .signup { grid-template-columns: 1fr; gap: 30px; }
-}
-@media (max-width: 560px) {
-  .wrap { width: calc(100% - 32px); }
-  .nav { min-height: 68px; }
-  .brand { font-size: 16px; letter-spacing: 2px; }
-  .brand-symbol { width: 28px; height: 28px; }
-  .nav-links { gap: 0; }
-  .nav-links a:not(.nav-cta) { display: none; }
-  .nav-cta { min-height: 39px; padding: 0 11px; font-size: 10px; }
-  .hero { padding-top: 56px; padding-bottom: 45px; }
-  .hero h1 { font-size: clamp(76px, 20vw, 112px); }
-  .hero-description { font-size: 13px; }
-  .hero-art { min-height: 340px; }
-  .art-label.top { top: 15px; }
-  .art-label.bottom { bottom: 10px; }
-  .ticker-inner { padding: 14px 0; gap: 12px; font-size: 8px; }
-  .launch-panel { padding: 20px 14px; }
-  .countdown { gap: 6px; margin-top: 23px; }
-  .time-unit { padding: 16px 3px; }
-  .time-unit strong { font-size: clamp(23px, 7vw, 34px); }
-  .time-unit span { font-size: 7px; letter-spacing: 1px; }
-  .features { grid-template-columns: 1fr; }
-  .feature { min-height: 225px; }
-  .signup { padding: 25px 19px; }
-  .footer-main { align-items: flex-start; flex-direction: column; }
-  .footer-bottom .wrap { flex-direction: column; gap: 7px; }
-}
-</style>
+    h1, h2, h3, .brand, .button, .stat-number {
+      font-family: "Barlow Condensed", Impact, sans-serif;
+      text-transform: uppercase;
+    }
+
+    .topline {
+      height: 3px;
+      background: linear-gradient(90deg, #8d1018, var(--red), #5c080d);
+    }
+
+    /* Navigation */
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(9,9,9,.92);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+    }
+
+    .nav {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+    }
+
+    .brand-mark {
+      width: 39px;
+      height: 39px;
+      display: grid;
+      place-items: center;
+      background: var(--red);
+      color: white;
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 27px;
+      font-weight: 900;
+      clip-path: polygon(0 0,100% 0,100% 75%,75% 100%,0 100%);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #b8b8b8;
+    }
+
+    .nav-links a:hover { color: white; }
+
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 0 23px;
+      border: 1px solid transparent;
+      background: var(--red);
+      color: white;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: background .2s, transform .2s, border-color .2s;
+      clip-path: polygon(0 0,100% 0,100% 75%,91% 100%,0 100%);
+    }
+
+    .button:hover {
+      background: var(--red-bright);
+      transform: translateY(-2px);
+    }
+
+    .button-outline {
+      background: rgba(0,0,0,.25);
+      border-color: rgba(255,255,255,.25);
+    }
+
+    .button-outline:hover {
+      background: rgba(237,37,46,.12);
+      border-color: var(--red);
+    }
+
+    .button:disabled {
+      opacity: .65;
+      cursor: wait;
+      transform: none;
+    }
+
+    /* Hero */
+
+    .hero {
+      position: relative;
+      min-height: 690px;
+      display: flex;
+      align-items: center;
+      isolation: isolate;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(90deg, #090909 0%, rgba(9,9,9,.96) 29%, rgba(9,9,9,.65) 62%, rgba(9,9,9,.5) 100%),
+        linear-gradient(0deg, #090909 0%, transparent 35%),
+        url("https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=2000&q=85") center 40% / cover,
+        #151515;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 78% 43%, rgba(237,37,46,.19), transparent 36%),
+        linear-gradient(115deg, transparent 48%, rgba(237,37,46,.08) 48.1%, transparent 48.6%);
+    }
+
+    .hero::after {
+      content: "Z";
+      position: absolute;
+      z-index: -1;
+      right: 4%;
+      top: 50%;
+      transform: translateY(-55%) skew(-8deg);
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: clamp(300px, 44vw, 650px);
+      font-weight: 900;
+      line-height: .8;
+      color: rgba(237,37,46,.075);
+      -webkit-text-stroke: 2px rgba(237,37,46,.14);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      padding-top: 70px;
+      padding-bottom: 95px;
+      max-width: 740px;
+    }
+
+    .live-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      margin-bottom: 25px;
+      border: 1px solid rgba(237,37,46,.45);
+      background: rgba(0,0,0,.45);
+      color: #f3b5b8;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--red);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--red);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      50% { opacity: .35; }
+    }
+
+    .hero h1 {
+      max-width: 800px;
+      margin: 0 0 17px;
+      font-size: clamp(78px, 13vw, 156px);
+      font-weight: 900;
+      line-height: .76;
+      letter-spacing: -2px;
+    }
+
+    .hero h1 span {
+      display: block;
+      color: var(--red);
+    }
+
+    .hero-subtitle {
+      margin: 28px 0 0;
+      max-width: 520px;
+      color: #b9b9b9;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 13px;
+      margin-top: 30px;
+    }
+
+    .hero-code {
+      margin-top: 40px;
+      color: #777;
+      font-family: monospace;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+    }
+
+    .hero-code strong { color: var(--red); }
+
+    .hero-corner {
+      position: absolute;
+      right: 30px;
+      bottom: 32px;
+      color: rgba(255,255,255,.45);
+      font-family: monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      writing-mode: vertical-rl;
+    }
+
+    /* Tactical information strip */
+
+    .intel-strip {
+      background: #101010;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .intel-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .intel-item {
+      min-height: 104px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 26px;
+      border-right: 1px solid var(--line);
+    }
+
+    .intel-item:first-child { border-left: 1px solid var(--line); }
+
+    .intel-icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      color: var(--red);
+      border: 1px solid rgba(237,37,46,.35);
+      background: rgba(237,37,46,.07);
+      font-size: 17px;
+    }
+
+    .intel-label {
+      margin-bottom: 6px;
+      color: #777;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .intel-value {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .4px;
+    }
+
+    /* Sections */
+
+    section { position: relative; }
+
+    .section {
+      padding: 110px 0;
+    }
+
+    .section-heading {
+      max-width: 700px;
+      margin-bottom: 44px;
+    }
+
+    .section-heading h2 {
+      margin: 17px 0 15px;
+      font-size: clamp(44px, 7vw, 76px);
+      line-height: .95;
+      font-weight: 900;
+    }
+
+    .section-heading p {
+      max-width: 560px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.9;
+    }
+
+    /* Launch countdown */
+
+    .launch-section {
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(237,37,46,.11), transparent 58%),
+        #0c0c0c;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .launch-panel {
+      position: relative;
+      padding: clamp(28px, 6vw, 64px);
+      overflow: hidden;
+      border: 1px solid rgba(237,37,46,.28);
+      background: linear-gradient(135deg, #151111, #0d0d0d 55%);
+    }
+
+    .launch-panel::after {
+      content: "CLASSIFIED";
+      position: absolute;
+      right: -18px;
+      bottom: 18px;
+      color: rgba(255,255,255,.025);
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: clamp(80px, 14vw, 170px);
+      font-weight: 900;
+      pointer-events: none;
+    }
+
+    .launch-top {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .launch-top h2 {
+      margin: 15px 0 8px;
+      font-size: clamp(42px, 7vw, 72px);
+      line-height: .95;
+    }
+
+    .launch-top p {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .status-chip {
+      flex-shrink: 0;
+      padding: 10px 12px;
+      border: 1px solid rgba(237,37,46,.4);
+      color: #ff8c91;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+    }
+
+    .countdown {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 38px;
+    }
+
+    .time-box {
+      min-width: 0;
+      padding: 22px 10px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.35);
+      text-align: center;
+    }
+
+    .time-number {
+      display: block;
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: clamp(37px, 7vw, 68px);
+      font-weight: 800;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .time-label {
+      display: block;
+      margin-top: 10px;
+      color: #858585;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    .launch-note {
+      position: relative;
+      z-index: 1;
+      margin: 22px 0 0;
+      color: #858585;
+      font-size: 11px;
+    }
+
+    /* Modes */
+
+    .modes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .mode-card {
+      position: relative;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 28px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(0deg, rgba(0,0,0,.97), rgba(0,0,0,.15)),
+        radial-gradient(ellipse at 75% 20%, rgba(237,37,46,.24), transparent 55%),
+        #171717;
+      transition: border-color .25s, transform .25s;
+    }
+
+    .mode-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(237,37,46,.65);
+    }
+
+    .mode-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 28px;
+      width: 45px;
+      height: 3px;
+      background: var(--red);
+    }
+
+    .mode-index {
+      position: absolute;
+      top: 22px;
+      right: 24px;
+      color: rgba(255,255,255,.2);
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 45px;
+      font-weight: 800;
+    }
+
+    .mode-symbol {
+      width: 47px;
+      height: 47px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 22px;
+      border: 1px solid rgba(237,37,46,.45);
+      color: var(--red);
+      font-size: 20px;
+    }
+
+    .mode-card h3 {
+      margin-bottom: 10px;
+      font-size: 31px;
+      line-height: 1;
+    }
+
+    .mode-card p {
+      margin-bottom: 0;
+      color: #999;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .mode-tag {
+      display: inline-block;
+      margin-top: 18px;
+      color: #e86b70;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    /* Features */
+
+    .features-section {
+      background: #101010;
+      border-block: 1px solid var(--line);
+    }
+
+    .features-layout {
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      gap: 65px;
+      align-items: center;
+    }
+
+    .feature-visual {
+      position: relative;
+      min-height: 410px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid rgba(237,37,46,.25);
+      background:
+        radial-gradient(ellipse at center, rgba(237,37,46,.16), transparent 58%),
+        repeating-linear-gradient(0deg, transparent 0 39px, rgba(255,255,255,.035) 40px),
+        repeating-linear-gradient(90deg, transparent 0 39px, rgba(255,255,255,.035) 40px),
+        #0b0b0b;
+    }
+
+    .feature-visual::before {
+      content: "";
+      position: absolute;
+      width: 230px;
+      height: 230px;
+      border: 1px solid rgba(237,37,46,.55);
+      transform: rotate(45deg);
+      box-shadow: 0 0 65px rgba(237,37,46,.08), inset 0 0 45px rgba(237,37,46,.06);
+    }
+
+    .feature-visual::after {
+      content: "Z";
+      position: relative;
+      color: var(--red);
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 190px;
+      font-weight: 900;
+      text-shadow: 0 0 50px rgba(237,37,46,.25);
+    }
+
+    .visual-label {
+      position: absolute;
+      bottom: 18px;
+      left: 20px;
+      color: #777;
+      font-family: monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 0;
+    }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 17px;
+      padding: 23px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .feature-row:first-child { border-top: 1px solid var(--line); }
+
+    .feature-number {
+      color: var(--red);
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .feature-row h3 {
+      margin: 0 0 7px;
+      font-size: 22px;
+    }
+
+    .feature-row p {
+      margin: 0;
+      color: #929292;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    /* Registration */
+
+    .register-section {
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 100% 50%, rgba(237,37,46,.12), transparent 40%),
+        #090909;
+    }
+
+    .register-layout {
+      display: grid;
+      grid-template-columns: 1fr .85fr;
+      gap: 70px;
+      align-items: center;
+    }
+
+    .register-copy h2 {
+      margin: 17px 0;
+      font-size: clamp(48px, 7vw, 82px);
+      line-height: .88;
+    }
+
+    .register-copy p {
+      max-width: 480px;
+      color: #999;
+      font-size: 13px;
+      line-height: 1.9;
+    }
+
+    .register-points {
+      display: grid;
+      gap: 12px;
+      margin-top: 25px;
+      color: #c3c3c3;
+      font-size: 11px;
+    }
+
+    .register-points span::before {
+      content: "✓";
+      margin-right: 10px;
+      color: var(--red);
+      font-weight: 900;
+    }
+
+    .register-card {
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid rgba(237,37,46,.28);
+      background: linear-gradient(145deg, #151515, #0c0c0c);
+      box-shadow: 0 20px 80px rgba(0,0,0,.3);
+    }
+
+    .register-card h3 {
+      margin-bottom: 8px;
+      font-size: 34px;
+    }
+
+    .register-card > p {
+      margin-bottom: 25px;
+      color: #888;
+      font-size: 11px;
+      line-height: 1.8;
+    }
+
+    .field-label {
+      display: block;
+      margin: 0 0 9px;
+      color: #aaa;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .email-input {
+      width: 100%;
+      height: 52px;
+      padding: 0 15px;
+      border: 1px solid #333;
+      outline: none;
+      background: #090909;
+      color: white;
+      font-size: 13px;
+      transition: border-color .2s;
+    }
+
+    .email-input:focus { border-color: var(--red); }
+    .email-input::placeholder { color: #5c5c5c; }
+
+    .consent-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 17px 0 20px;
+      color: #999;
+      font-size: 10px;
+      line-height: 1.7;
+    }
+
+    .consent-row input {
+      margin-top: 3px;
+      accent-color: var(--red);
+    }
+
+    .register-submit { width: 100%; }
+
+    .form-message {
+      min-height: 18px;
+      margin: 14px 0 0;
+      color: #bcbcbc;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .form-message.success { color: #9ce5a9; }
+    .form-message.error { color: #ff7f86; }
+
+    /* Footer */
+
+    footer {
+      background: #070707;
+      border-top: 1px solid var(--line);
+    }
+
+    .footer-main {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 30px;
+      padding-top: 45px;
+      padding-bottom: 40px;
+    }
+
+    .footer-note {
+      margin: 15px 0 0;
+      color: #666;
+      font-size: 10px;
+      line-height: 1.9;
+      letter-spacing: 1px;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 22px;
+      padding-top: 10px;
+      color: #888;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .footer-links a:hover { color: var(--red); }
+
+    .footer-bottom {
+      border-top: 1px solid var(--line);
+    }
+
+    .footer-bottom-inner {
+      min-height: 58px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      color: #555;
+      font-family: monospace;
+      font-size: 9px;
+      letter-spacing: .7px;
+    }
+
+    .admin-secret {
+      display: flex;
+      justify-content: center;
+      padding: 13px 0 20px;
+    }
+
+    .admin-shield {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #262626;
+      background: #0d0d0d;
+      color: #555;
+      transition: color .2s, border-color .2s, box-shadow .2s;
+    }
+
+    .admin-shield svg {
+      width: 19px;
+      height: 19px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .admin-shield span {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translate(-50%, 4px);
+      padding: 7px 11px;
+      background: var(--red);
+      color: white;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .2s, transform .2s;
+    }
+
+    .admin-shield span::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: calc(50% - 4px);
+      border: 4px solid transparent;
+      border-top-color: var(--red);
+    }
+
+    .admin-shield:hover,
+    .admin-shield:focus-visible {
+      color: var(--red);
+      border-color: var(--red);
+      box-shadow: 0 0 18px rgba(237,37,46,.18);
+    }
+
+    .admin-shield:hover span,
+    .admin-shield:focus-visible span {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, 0);
+    }
+
+    /* Responsive */
+
+    @media (max-width: 850px) {
+      .nav-links { gap: 15px; }
+      .nav-cta { display: none; }
+      .hero { min-height: 620px; }
+      .modes-grid { grid-template-columns: 1fr 1fr; }
+      .mode-card:last-child { grid-column: 1 / -1; min-height: 250px; }
+      .features-layout, .register-layout { grid-template-columns: 1fr; gap: 40px; }
+      .feature-visual { min-height: 300px; }
+      .register-layout { gap: 35px; }
+    }
+
+    @media (max-width: 560px) {
+      .wrap { width: min(100% - 32px, var(--max)); }
+      .nav { min-height: 68px; }
+      .brand { font-size: 20px; gap: 9px; }
+      .brand-mark { width: 34px; height: 34px; font-size: 23px; }
+      .nav-links { gap: 13px; font-size: 9px; }
+      .nav-links a:first-child { display: none; }
+      .hero { min-height: 600px; background-position: 55% center; }
+      .hero-content { padding-top: 65px; padding-bottom: 80px; }
+      .hero h1 { font-size: clamp(76px, 20vw, 110px); }
+      .hero-subtitle { font-size: 12px; }
+      .hero-corner { display: none; }
+      .intel-grid { grid-template-columns: 1fr; }
+      .intel-item, .intel-item:first-child {
+        min-height: 76px;
+        padding: 15px 5px;
+        border-left: 0;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .intel-item:last-child { border-bottom: 0; }
+      .section { padding: 75px 0; }
+      .section-heading { margin-bottom: 30px; }
+      .launch-top { flex-direction: column; }
+      .countdown { gap: 7px; }
+      .time-box { padding: 17px 3px; }
+      .time-number { font-size: clamp(32px, 10vw, 48px); }
+      .time-label { font-size: 8px; letter-spacing: 1px; }
+      .modes-grid { grid-template-columns: 1fr; }
+      .mode-card, .mode-card:last-child { grid-column: auto; min-height: 245px; }
+      .feature-visual { min-height: 255px; }
+      .feature-visual::before { width: 155px; height: 155px; }
+      .feature-visual::after { font-size: 135px; }
+      .footer-main { flex-direction: column; }
+      .footer-links { gap: 17px; }
+      .footer-bottom-inner {
+        min-height: 72px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<header>
-  <div class="wrap nav">
-    <a class="brand" href="#" aria-label="The ZAR home">
-      <span class="brand-symbol">Z</span>
-      <span>THE ZAR</span>
-    </a>
-    <nav class="nav-links" aria-label="Main navigation">
-      <a href="#experience">EXPERIENCE</a>
-      <a href="#launch">LAUNCH</a>
-      <a href="#register" class="nav-cta">GET EARLY UPDATES ↗</a>
-    </nav>
-  </div>
-</header>
+  <div class="topline"></div>
 
-<main>
-  <section class="hero wrap">
-    <div class="hero-copy reveal">
-      <div class="kicker"><span class="live-dot"></span> THE NEXT ERA IS LOADING</div>
-      <h1>
-        <span class="outline">ENTER</span>
-        <span class="lime">THE ZAR.</span>
-      </h1>
-      <p class="hero-description">
-        Something different is being built. Get ready for a new gaming
-        experience, follow the journey, and be here before the world joins in.
-      </p>
-      <div class="hero-actions">
-        <a class="button" href="#register">JOIN THE PRE-LAUNCH <span>↗</span></a>
-        <a class="button button-outline" href="#experience">EXPLORE THE PROJECT ↓</a>
-      </div>
-      <div class="hero-note">IN DEVELOPMENT <span style="color:var(--lime)">/</span> RELEASE DATE ANNOUNCED HERE</div>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="#home" aria-label="THE ZAR home">
+        <span class="brand-mark">Z</span>
+        <span>THE <span class="red">ZAR</span></span>
+      </a>
+
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#modes">Combat</a>
+        <a href="#launch">Launch</a>
+        <a href="#register">Pre-register</a>
+      </nav>
+
+      <a class="button nav-cta" href="#register">Join the operation <span>↗</span></a>
     </div>
+  </header>
 
-    <div class="hero-art" aria-label="Abstract ZAR emblem artwork" role="img">
-      <div class="art-grid"></div>
-      <div class="art-glow"></div>
-      <div class="art-ring"></div>
-      <div class="art-ring two"></div>
-      <div class="art-ring three"></div>
-      <div class="art-core"><div class="art-z">Z</div></div>
-      <div class="art-label top">
-        <small>PROJECT STATUS</small>
-        <strong><em>●</em> IN DEVELOPMENT</strong>
-      </div>
-      <div class="art-label bottom">
-        <small>YOUR NEXT DESTINATION</small>
-        <strong>THE ZAR® / 001</strong>
-      </div>
-    </div>
-  </section>
-
-  <div class="ticker">
-    <div class="wrap ticker-inner">
-      <span><b>✳</b> THE ZAR PROJECT</span>
-      <span>BUILT FOR PLAYERS</span>
-      <span><b>✳</b> THE NEXT ERA</span>
-      <span>COMING WHEN IT'S READY</span>
-      <span><b>✳</b> BE THERE FIRST</span>
-    </div>
-  </div>
-
-  <section class="section wrap" id="launch">
-    <div class="section-head">
-      <div>
-        <div class="section-tag">/ 001 — THE COUNTDOWN</div>
-        <h2>THE WAIT<br>WON'T LAST <span>FOREVER.</span></h2>
-      </div>
-      <p>
-        The release date is controlled by the team. Check back here as the
-        launch gets closer and follow official announcements.
-      </p>
-    </div>
-
-    <div class="launch-panel">
-      <div class="launch-top">
-        <div class="launch-title">THE ZAR / LAUNCH SEQUENCE</div>
-        <div class="launch-state" id="launch-state">● AWAITING DATE</div>
-      </div>
-
-      <div class="countdown" aria-label="Time until launch">
-        <div class="time-unit"><strong id="days">--</strong><span>DAYS</span></div>
-        <div class="time-unit"><strong id="hours">--</strong><span>HOURS</span></div>
-        <div class="time-unit"><strong id="minutes">--</strong><span>MINUTES</span></div>
-        <div class="time-unit"><strong id="seconds">--</strong><span>SECONDS</span></div>
-      </div>
-      <p class="launch-caption" id="launch-caption" aria-live="polite">
-        The launch date will appear here when officially announced.
-      </p>
-    </div>
-  </section>
-
-  <section class="section wrap" id="experience">
-    <div class="section-head">
-      <div>
-        <div class="section-tag">/ 002 — THE VISION</div>
-        <h2>THIS IS JUST<br>THE <span>BEGINNING.</span></h2>
-      </div>
-      <p>
-        We're working on the experience now. Here's what being part of
-        the early community means.
-      </p>
-    </div>
-
-    <div class="features">
-      <article class="feature">
-        <div class="feature-icon">◈</div>
-        <div class="feature-number">01 / DISCOVERY</div>
-        <h3>A new world</h3>
-        <p>Get ready to discover The ZAR as development progresses and new details are revealed.</p>
-      </article>
-      <article class="feature">
-        <div class="feature-icon">⌁</div>
-        <div class="feature-number">02 / COMMUNITY</div>
-        <h3>Be part of it</h3>
-        <p>Join the early list and get important launch announcements as they become available.</p>
-      </article>
-      <article class="feature">
-        <div class="feature-icon">↗</div>
-        <div class="feature-number">03 / FIRST ACCESS</div>
-        <h3>Don't miss the drop</h3>
-        <p>Keep up with official updates so you know when The ZAR is ready to play.</p>
-      </article>
-    </div>
-  </section>
-
-  <section class="signup-section wrap" id="register">
-    <div class="signup">
-      <div>
-        <div class="kicker"><span class="live-dot"></span> YOUR STORY STARTS HERE</div>
-        <h2>BE THERE<br>FROM <span>DAY ONE.</span></h2>
-        <p class="signup-copy">
-          Register your email to join The ZAR pre-launch list.
-          We'll use it for launch updates when email delivery is configured.
-          Registration is free and is not a purchase or a promise of early access.
-        </p>
-      </div>
-
-      <form class="signup-form" id="signup-form">
-        <label class="main-label" for="email">EMAIL ADDRESS</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="you@example.com"
-          autocomplete="email"
-          maxlength="254"
-          required
-        >
-
-        <label class="consent">
-          <input type="checkbox" id="consent" required>
-          <span>I agree to receive The ZAR launch updates by email. I can request to unsubscribe.</span>
-        </label>
-
-        <div style="position:absolute;left:-10000px" aria-hidden="true">
-          <label for="website">Leave this field empty</label>
-          <input id="website" name="website" tabindex="-1" autocomplete="off">
+  <main>
+    <section class="hero" id="home">
+      <div class="wrap hero-content">
+        <div class="live-label">
+          <span class="live-dot"></span>
+          NEXT-GENERATION FPS EXPERIENCE
         </div>
 
-        <button class="button" id="submit-button" type="submit">
-          SECURE MY SPOT ↗
-        </button>
-        <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
-        <p class="fineprint">
-          Your email is stored for the pre-launch list. Email confirmations
-          are not currently enabled.
+        <h1>ENTER THE <span>BATTLEFIELD.</span></h1>
+
+        <p class="hero-subtitle">
+          No easy victories. No second chances.
+          Prepare for THE ZAR — a new shooter experience where every
+          encounter is a fight for control.
         </p>
-      </form>
-    </div>
-  </section>
-</main>
 
-<footer>
-  <div class="wrap footer-main">
-    <div>
-      <a class="brand" href="#">
-        <span class="brand-symbol">Z</span><span>THE ZAR</span>
+        <div class="hero-actions">
+          <a class="button" href="#register">PRE-REGISTER <span>↗</span></a>
+          <a class="button button-outline" href="#modes">EXPLORE THE GAME <span>↓</span></a>
+        </div>
+
+        <div class="hero-code">
+          <strong>OPERATION ZAR</strong> &nbsp; // &nbsp; STATUS: PRE-LAUNCH
+        </div>
+      </div>
+
+      <div class="hero-corner">TACTICAL SYSTEMS // ONLINE</div>
+    </section>
+
+    <div class="intel-strip">
+      <div class="wrap intel-grid">
+        <div class="intel-item">
+          <div class="intel-icon">⌖</div>
+          <div>
+            <div class="intel-label">Combat type</div>
+            <div class="intel-value">First-person shooter</div>
+          </div>
+        </div>
+
+        <div class="intel-item">
+          <div class="intel-icon">◈</div>
+          <div>
+            <div class="intel-label">Mission status</div>
+            <div class="intel-value">Launch preparation</div>
+          </div>
+        </div>
+
+        <div class="intel-item">
+          <div class="intel-icon">▰</div>
+          <div>
+            <div class="intel-label">Access</div>
+            <div class="intel-value">Pre-registration open</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="section launch-section" id="launch">
+      <div class="wrap">
+        <div class="launch-panel">
+          <div class="launch-top">
+            <div>
+              <div class="eyebrow">Mission countdown</div>
+              <h2 id="launch-title">LAUNCHING <span class="red">SOON.</span></h2>
+              <p id="launch-description">The deployment date has not been announced yet. Stay ready.</p>
+            </div>
+
+            <div class="status-chip" id="launch-status">STATUS // PENDING</div>
+          </div>
+
+          <div class="countdown" id="countdown">
+            <div class="time-box">
+              <span class="time-number" id="days">--</span>
+              <span class="time-label">DAYS</span>
+            </div>
+            <div class="time-box">
+              <span class="time-number" id="hours">--</span>
+              <span class="time-label">HOURS</span>
+            </div>
+            <div class="time-box">
+              <span class="time-number" id="minutes">--</span>
+              <span class="time-label">MINUTES</span>
+            </div>
+            <div class="time-box">
+              <span class="time-number" id="seconds">--</span>
+              <span class="time-label">SECONDS</span>
+            </div>
+          </div>
+
+          <p class="launch-note" id="launch-note">
+            // The official launch date will appear here once announced.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="modes">
+      <div class="wrap">
+        <div class="section-heading">
+          <div class="eyebrow">Choose your battlefield</div>
+          <h2>ONE GAME.<br><span class="red">NO SAFE ZONES.</span></h2>
+          <p>
+            Enter the fight, adapt to the situation, and make every move count.
+            The battlefield is waiting.
+          </p>
+        </div>
+
+        <div class="modes-grid">
+          <article class="mode-card">
+            <span class="mode-index">01</span>
+            <div class="mode-symbol">⌖</div>
+            <h3>TACTICAL COMBAT</h3>
+            <p>Precision, positioning, and split-second decisions decide the outcome.</p>
+            <span class="mode-tag">PRECISION // CONTROL</span>
+          </article>
+
+          <article class="mode-card">
+            <span class="mode-index">02</span>
+            <div class="mode-symbol">◈</div>
+            <h3>SQUAD OPERATIONS</h3>
+            <p>Coordinate your moves, support your team, and push through the opposition.</p>
+            <span class="mode-tag">TEAMWORK // STRATEGY</span>
+          </article>
+
+          <article class="mode-card">
+            <span class="mode-index">03</span>
+            <div class="mode-symbol">✳</div>
+            <h3>OPEN COMBAT</h3>
+            <p>Adapt to the chaos and prove your skills in the heat of battle.</p>
+            <span class="mode-tag">ADAPT // OVERCOME</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section features-section">
+      <div class="wrap features-layout">
+        <div class="feature-visual" aria-label="THE ZAR insignia">
+          <span class="visual-label">ZAR SYSTEM // 001</span>
+        </div>
+
+        <div>
+          <div class="section-heading">
+            <div class="eyebrow">Built for the fight</div>
+            <h2>LOCK IN.<br><span class="red">STAY SHARP.</span></h2>
+            <p>
+              Every encounter should feel intense. Get ready to enter
+              a world built around first-person combat.
+            </p>
+          </div>
+
+          <div class="feature-list">
+            <div class="feature-row">
+              <div class="feature-number">01</div>
+              <div>
+                <h3>FIRST-PERSON ACTION</h3>
+                <p>Keep your focus on the battlefield and react when every second matters.</p>
+              </div>
+            </div>
+
+            <div class="feature-row">
+              <div class="feature-number">02</div>
+              <div>
+                <h3>WEAPON-DRIVEN GAMEPLAY</h3>
+                <p>Enter combat, learn your playstyle, and build your own approach to each fight.</p>
+              </div>
+            </div>
+
+            <div class="feature-row">
+              <div class="feature-number">03</div>
+              <div>
+                <h3>A WORLD IN DEVELOPMENT</h3>
+                <p>THE ZAR is preparing for launch. More details will be revealed as development continues.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section register-section" id="register">
+      <div class="wrap register-layout">
+        <div class="register-copy">
+          <div class="eyebrow">Your deployment starts here</div>
+          <h2>BE THERE<br>WHEN THE <span class="red">GATES OPEN.</span></h2>
+          <p>
+            Get on the pre-registration list for THE ZAR.
+            Leave your email to receive launch updates when they're available.
+          </p>
+
+          <div class="register-points">
+            <span>Launch announcements</span>
+            <span>Important game updates</span>
+            <span>One place to stay informed</span>
+          </div>
+        </div>
+
+        <div class="register-card">
+          <h3>JOIN THE LIST.</h3>
+          <p>Enter your email address to register your interest in THE ZAR.</p>
+
+          <form id="register-form">
+            <label class="field-label" for="email">Email address</label>
+            <input
+              class="email-input"
+              id="email"
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+              maxlength="254"
+              required
+            >
+
+            <div style="position:absolute;left:-9999px;" aria-hidden="true">
+              <label for="website">Leave this field empty</label>
+              <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
+
+            <label class="consent-row">
+              <input id="consent" name="consent" type="checkbox" required>
+              <span>I agree to receive pre-launch and launch-related updates about THE ZAR by email.</span>
+            </label>
+
+            <button class="button register-submit" id="register-button" type="submit">
+              CONFIRM PRE-REGISTRATION <span>↗</span>
+            </button>
+
+            <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-main">
+      <div>
+        <a class="brand" href="#home">
+          <span class="brand-mark">Z</span>
+          <span>THE <span class="red">ZAR</span></span>
+        </a>
+        <p class="footer-note">ENTER THE BATTLEFIELD.<br>THE NEXT ERA IS LOADING.</p>
+      </div>
+
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="#modes">Combat</a>
+        <a href="#launch">Launch</a>
+        <a href="#register">Pre-register</a>
+      </nav>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="wrap footer-bottom-inner">
+        <span>© <span id="year"></span> THE ZAR. ALL RIGHTS RESERVED.</span>
+        <span>COMBAT SYSTEMS // INITIALIZING</span>
+      </div>
+    </div>
+
+    <div class="admin-secret">
+      <a href="/admin" class="admin-shield" aria-label="Admin" title="Admin">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2 20 5v6c0 5.2-3.4 9-8 11-4.6-2-8-5.8-8-11V5l8-3Z"/>
+          <path d="m8.5 12 2.2 2.2 4.8-5"/>
+        </svg>
+        <span>ADMIN</span>
       </a>
-      <p class="footer-note">A new experience is on the horizon.<br>See you on the other side.</p>
     </div>
-    <nav class="footer-links" aria-label="Footer navigation">
-      <a href="#experience">Experience</a>
-      <a href="#launch">Launch</a>
-      <a href="#register">Pre-register</a>
-    </nav>
-  </div>
-  <div class="footer-bottom">
-    <div class="wrap">
-      <span>© <span id="year"></span> THE ZAR. ALL RIGHTS RESERVED.</span>
-      <span>MADE FOR THE NEXT ERA.</span>
-    </div>
-  </div>
-</footer>
+  </footer>
 
-<script>
-  document.getElementById("year").textContent = new Date().getFullYear();
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
 
-  // PRE-REGISTRATION
-  const form = document.getElementById("signup-form");
-  const button = document.getElementById("submit-button");
-  const formStatus = document.getElementById("form-status");
+    // Pre-registration: keeps the existing Cloudflare Worker endpoint.
+    const form = document.getElementById("register-form");
+    const submitButton = document.getElementById("register-button");
+    const formMessage = document.getElementById("form-message");
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    formStatus.className = "form-status";
-    formStatus.textContent = "";
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-    if (!form.reportValidity()) return;
-    if (document.getElementById("website").value) return;
+      const email = document.getElementById("email").value.trim();
+      const consent = document.getElementById("consent").checked;
+      const website = document.getElementById("website").value;
 
-    button.disabled = true;
-    button.textContent = "PLEASE WAIT…";
-
-    try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: document.getElementById("email").value.trim(),
-          consent: document.getElementById("consent").checked,
-          website: document.getElementById("website").value
-        })
-      });
-
-      const result = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(result.message || "Registration failed. Please try again.");
+      if (!email || !consent) {
+        formMessage.textContent = "Please enter your email and accept the checkbox.";
+        formMessage.className = "form-message error";
+        return;
       }
 
-      formStatus.className = "form-status success";
-      formStatus.textContent = result.message || "Thanks for your interest in The ZAR!";
-      form.reset();
-    } catch (error) {
-      formStatus.className = "form-status error";
-      formStatus.textContent = error.message || "Something went wrong. Please try again.";
-    } finally {
-      button.disabled = false;
-      button.textContent = "SECURE MY SPOT ↗";
-    }
-  });
+      submitButton.disabled = true;
+      submitButton.innerHTML = "CONNECTING...";
+      formMessage.textContent = "";
 
-  // LIVE LAUNCH COUNTDOWN — reads the date saved in the admin panel.
-  let launchDate = null;
+      try {
+        const response = await fetch("/api/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, consent, website })
+        });
 
-  const daysEl = document.getElementById("days");
-  const hoursEl = document.getElementById("hours");
-  const minutesEl = document.getElementById("minutes");
-  const secondsEl = document.getElementById("seconds");
-  const launchState = document.getElementById("launch-state");
-  const launchCaption = document.getElementById("launch-caption");
+        const result = await response.json().catch(() => ({}));
 
-  function setWaiting() {
-    daysEl.textContent = "--";
-    hoursEl.textContent = "--";
-    minutesEl.textContent = "--";
-    secondsEl.textContent = "--";
-    launchState.textContent = "● AWAITING DATE";
-    launchCaption.textContent =
-      "The launch date will appear here when officially announced.";
-  }
+        if (!response.ok) {
+          throw new Error(result.error || result.message || "Registration failed. Please try again.");
+        }
 
-  function updateCountdown() {
-    if (!launchDate) {
-      setWaiting();
-      return;
-    }
+        formMessage.textContent = result.message || "Registration successful. You're on the list.";
+        formMessage.className = "form-message success";
+        form.reset();
+      } catch (error) {
+        formMessage.textContent = error.message || "Something went wrong. Please try again.";
+        formMessage.className = "form-message error";
+      } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'CONFIRM PRE-REGISTRATION <span>↗</span>';
+      }
+    });
 
-    const remaining = launchDate.getTime() - Date.now();
+    // Launch countdown: reads the date configured in the existing admin panel.
+    const launchTitle = document.getElementById("launch-title");
+    const launchDescription = document.getElementById("launch-description");
+    const launchStatus = document.getElementById("launch-status");
+    const launchNote = document.getElementById("launch-note");
+    const countdown = document.getElementById("countdown");
 
-    if (remaining <= 0) {
-      daysEl.textContent = "00";
-      hoursEl.textContent = "00";
-      minutesEl.textContent = "00";
-      secondsEl.textContent = "00";
-      launchState.textContent = "● LAUNCH TIME";
-      launchCaption.textContent =
-        "The scheduled launch time has arrived. Check official game links for availability.";
-      return;
+    let launchDate = null;
+
+    function showUndecided() {
+      launchTitle.innerHTML = 'LAUNCHING <span class="red">SOON.</span>';
+      launchDescription.textContent = "The deployment date has not been announced yet. Stay ready.";
+      launchStatus.textContent = "STATUS // PENDING";
+      launchNote.textContent = "// The official launch date will appear here once announced.";
+      countdown.hidden = true;
     }
 
-    const totalSeconds = Math.floor(remaining / 1000);
-    const days = Math.floor(totalSeconds / 86400);
-    const hours = Math.floor((totalSeconds % 86400) / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
+    function showCountdown() {
+      if (!launchDate) return;
 
-    daysEl.textContent = String(days).padStart(2, "0");
-    hoursEl.textContent = String(hours).padStart(2, "0");
-    minutesEl.textContent = String(minutes).padStart(2, "0");
-    secondsEl.textContent = String(seconds).padStart(2, "0");
+      const remaining = launchDate.getTime() - Date.now();
 
-    launchState.textContent = "● COUNTDOWN ACTIVE";
-    launchCaption.textContent =
-      "Time remaining until The ZAR's scheduled launch.";
-  }
+      if (remaining <= 0) {
+        launchTitle.innerHTML = 'DEPLOYMENT <span class="red">IMMINENT.</span>';
+        launchDescription.textContent = "The scheduled launch time has arrived.";
+        launchStatus.textContent = "STATUS // TIME REACHED";
+        launchNote.textContent = "// Check the official game page for availability.";
+        countdown.hidden = true;
+        return;
+      }
 
-  async function loadLaunchDate() {
-    try {
-      const response = await fetch("/api/launch", { cache: "no-store" });
-      if (!response.ok) throw new Error("Launch date unavailable");
+      countdown.hidden = false;
 
-      const data = await response.json();
-      const parsed = data.launch_at ? new Date(data.launch_at) : null;
+      const days = Math.floor(remaining / 86400000);
+      const hours = Math.floor((remaining % 86400000) / 3600000);
+      const minutes = Math.floor((remaining % 3600000) / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
 
-      launchDate = parsed && Number.isFinite(parsed.getTime()) ? parsed : null;
-      updateCountdown();
-    } catch (error) {
-      console.error("Unable to load launch date:", error);
-      // Keep the last known date if a temporary request fails.
-      updateCountdown();
+      document.getElementById("days").textContent = String(days).padStart(2, "0");
+      document.getElementById("hours").textContent = String(hours).padStart(2, "0");
+      document.getElementById("minutes").textContent = String(minutes).padStart(2, "0");
+      document.getElementById("seconds").textContent = String(seconds).padStart(2, "0");
     }
-  }
 
-  loadLaunchDate();
-  setInterval(updateCountdown, 1000);
-  setInterval(loadLaunchDate, 60000);
-</script>
+    async function loadLaunchDate() {
+      try {
+        const response = await fetch("/api/launch", { cache: "no-store" });
+        if (!response.ok) throw new Error("Launch settings unavailable");
+
+        const data = await response.json();
+        const rawDate = data.launch_at;
+
+        if (!rawDate) {
+          launchDate = null;
+          showUndecided();
+          return;
+        }
+
+        const parsedDate = new Date(rawDate);
+
+        if (Number.isNaN(parsedDate.getTime())) {
+          launchDate = null;
+          showUndecided();
+          return;
+        }
+
+        launchDate = parsedDate;
+        launchTitle.innerHTML = 'THE COUNTDOWN <span class="red">BEGINS.</span>';
+        launchDescription.textContent = "The deployment date is set. Your mission begins in:";
+        launchStatus.textContent = "STATUS // SCHEDULED";
+        launchNote.textContent = "// Launch date: " + launchDate.toLocaleString(undefined, {
+          dateStyle: "medium",
+          timeStyle: "short"
+        });
+
+        showCountdown();
+      } catch {
+        // Keep the public launch date undecided if the API is unavailable.
+        launchDate = null;
+        showUndecided();
+      }
+    }
+
+    showUndecided();
+    loadLaunchDate();
+    setInterval(showCountdown, 1000);
+    setInterval(loadLaunchDate, 60000);
+  </script>
 </body>
 </html>

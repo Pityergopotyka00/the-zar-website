@@ -459,7 +459,7 @@ $("#logoutBtn").addEventListener("click", async () => {
 });
 
 $("#refreshBtn").addEventListener("click", () => { if(typeof zarActivity==="function") zarActivity("Refreshed current admin view"); return loadView(
-  $$$(".view").find(el => el.classList.contains("active"))?.id.replace("view-","") || "dashboard"
+  $(".view").find(el => el.classList.contains("active"))?.id.replace("view-","") || "dashboard"
 ).then(() => toast("Data refreshed.")).catch(e => toast(e.message)); });
 
 async function loadView(name) {

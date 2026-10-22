@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>The ZAR — Admin</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080a09;
+      --panel: #111512;
+      --border: #28332b;
+      --green: #b8ff5c;
+      --text: #f4f7f2;
+      --muted: #9ca79e;
+      --red: #ff7474;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 32px 16px;
+      background: radial-gradient(ellipse at top, #172219, var(--bg) 65%);
+      color: var(--text);
+      font-family: Inter, system-ui, Arial, sans-serif;
+    }
+    main { width: 100%; max-width: 900px; margin: auto; }
+    .brand {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 4px;
+    }
+    h1 { font-size: clamp(28px, 5vw, 42px); margin: 12px 0 6px; }
+    p { color: var(--muted); line-height: 1.5; }
+    .panel {
+      margin-top: 22px;
+      padding: 24px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+    h2 { margin-top: 0; font-size: 19px; }
+    label { display: block; margin: 16px 0 8px; color: var(--muted); }
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: #080b09;
+      color: var(--text);
+      font: inherit;
+    }
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 12px 17px;
+      margin-top: 14px;
+      background: var(--green);
+      color: #10150b;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: #222b24;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .hidden { display: none !important; }
+    .notice { min-height: 24px; font-size: 14px; }
+    .error { color: var(--red); }
+    .success { color: var(--green); }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+    }
+    .stat {
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #0b0f0c;
+    }
+    .stat span { color: var(--muted); font-size: 13px; }
+    .stat strong { display: block; margin-top: 8px; font-size: 30px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; }
+    .toolbar button { margin-top: 0; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    th { color: var(--muted); }
+    td { overflow-wrap: anywhere; }
+    small { color: var(--muted); }
+  </style>
+</head>
+<body>
+<main>
+  <div class="brand">THE ZAR / CONTROL CENTER</div>
+  <h1>Admin dashboard</h1>
+  <p>Manage your launch and view pre-registrations.</p>
+
+  <section id="login" class="panel">
+    <h2>Admin login</h2>
+    <form id="loginForm">
+      <label for="password">Admin password</label>
+      <input id="password" type="password" autocomplete="current-password"
+        required maxlength="1024">
+      <button type="submit">Log in</button>
+    </form>
+    <p id="loginMessage" class="notice" role="status"></p>
+  </section>
+
+  <section id="dashboard" class="hidden">
+    <div class="toolbar">
+      <button id="refresh" type="button">Refresh data</button>
+      <button id="logout" class="secondary" type="button">Log out</button>
+    </div>
+
+    <section class="panel">
+      <h2>Overview</h2>
+      <div class="stats">
+        <div class="stat">
+          <span>Total pre-registrations</span>
+          <strong id="total">—</strong>
+        </div>
+        <div class="stat">
+          <span>Current launch date</span>
+          <strong id="launchSummary" style="font-size:17px">Not set</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Launch settings</h2>
+      <p>Choose the launch date and time. Leave it empty to clear the date.</p>
+      <form id="settingsForm">
+        <label for="launchAt">Launch date and time (your local time)</label>
+        <input id="launchAt" type="datetime-local">
+        <button type="submit">Save launch date</button>
+      </form>
+      <p id="settingsMessage" class="notice" role="status"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Pre-registrations</h2>
+      <p>Showing up to the latest 500 addresses.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Email</th><th>Registered at</th></tr>
+          </thead>
+          <tbody id="registrationRows">
+            <tr><td colspan="2">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p id="registrationMessage" class="notice" role="status"></p>
+    </section>
+  </section>
+</main>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  async function api(path, options = {}) {
+    const response = await fetch(path, {
+      credentials: "same-origin",
+      ...options,
+      headers: {
+        ...(options.body ? { "Content-Type": "application/json" } : {}),
+        ...options.headers
+      }
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const error = new Error(data.message || "Request failed.");
+      error.status = response.status;
+      throw error;
+    }
+    return data;
+  }
+
+  function showDashboard(show) {
+    $("login").classList.toggle("hidden", show);
+    $("dashboard").classList.toggle("hidden", !show);
+  }
+
+  function setMessage(id, message, isError = false) {
+    const el = $(id);
+    el.textContent = message;
+    el.className = "notice " + (isError ? "error" : "success");
+  }
+
+  function localInputValue(iso) {
+    if (!iso) return "";
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return "";
+    const offset = date.getTimezoneOffset() * 60000;
+    return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+  }
+
+  function displayDate(iso) {
+    if (!iso) return "Not set";
+    const date = new Date(iso);
+    return Number.isNaN(date.getTime())
+      ? "Not set"
+      : date.toLocaleString();
+  }
+
+  async function loadData() {
+    try {
+      const [settings, registrations] = await Promise.all([
+        api("/api/admin/settings"),
+        api("/api/admin/registrations")
+      ]);
+
+      $("launchAt").value = localInputValue(settings.launch_at);
+      $("launchSummary").textContent = displayDate(settings.launch_at);
+      $("total").textContent = registrations.total;
+
+      const tbody = $("registrationRows");
+      tbody.replaceChildren();
+
+      if (!registrations.registrations.length) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 2;
+        cell.textContent = "No registrations yet.";
+        row.appendChild(cell);
+        tbody.appendChild(row);
+      } else {
+        for (const item of registrations.registrations) {
+          const row = document.createElement("tr");
+          const email = document.createElement("td");
+          const date = document.createElement("td");
+          email.textContent = item.email;
+          date.textContent = displayDate(item.created_at);
+          row.append(email, date);
+          tbody.appendChild(row);
+        }
+      }
+      setMessage("registrationMessage", "Data loaded.");
+    } catch (error) {
+      if (error.status === 401) {
+        showDashboard(false);
+        setMessage("loginMessage", "Your session expired. Log in again.", true);
+      } else {
+        setMessage("registrationMessage", error.message, true);
+      }
+    }
+  }
+
+  async function checkLogin() {
+    try {
+      await api("/api/admin/me");
+      showDashboard(true);
+      await loadData();
+    } catch {
+      showDashboard(false);
+    }
+  }
+
+  $("loginForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    setMessage("loginMessage", "Logging in…");
+    try {
+      await api("/api/admin/login", {
+        method: "POST",
+        body: JSON.stringify({ password: $("password").value })
+      });
+      $("password").value = "";
+      showDashboard(true);
+      await loadData();
+    } catch (error) {
+      setMessage("loginMessage", error.message, true);
+    }
+  });
+
+  $("settingsForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const value = $("launchAt").value;
+    const launch_at = value ? new Date(value).toISOString() : null;
+
+    try {
+      const result = await api("/api/admin/settings", {
+        method: "POST",
+        body: JSON.stringify({ launch_at })
+      });
+      $("launchSummary").textContent = displayDate(result.launch_at);
+      setMessage("settingsMessage", "Launch date saved!");
+    } catch (error) {
+      setMessage("settingsMessage", error.message, true);
+    }
+  });
+
+  $("refresh").addEventListener("click", loadData);
+
+  $("logout").addEventListener("click", async () => {
+    try {
+      await api("/api/admin/logout", { method: "POST", body: "{}" });
+    } finally {
+      showDashboard(false);
+      setMessage("loginMessage", "You are logged out.");
+    }
+  });
+
+  checkLogin();
+</script>
+</body>
+</html>

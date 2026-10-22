@@ -1325,6 +1325,36 @@
     @media(max-width:760px){.ops-head{align-items:flex-start;flex-direction:column}.ops-grid{grid-template-columns:1fr}.ops-main{min-height:330px}.roadmap{grid-template-columns:repeat(2,1fr)}.roadmap-step:nth-child(2){border-right:0}.roadmap-step:nth-child(-n+2){border-bottom:1px solid #292929}}
     @media(max-width:440px){.ops-tile{grid-template-columns:36px 1fr auto;padding:15px;gap:10px}.ops-tile-icon{width:36px;height:36px}.roadmap-step{padding:15px}}
   
+  
+/* COMMAND TERMINAL — new interactive feature */
+.command-section{background:#050505;border-block:1px solid #262626;position:relative;overflow:hidden}
+.command-section:before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(237,37,46,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(237,37,46,.025) 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(to bottom,black,transparent 90%);pointer-events:none}
+.command-layout{position:relative;display:grid;grid-template-columns:.8fr 1.2fr;gap:26px;align-items:stretch}
+.command-copy{padding:15px 0}
+.command-copy h2{font-size:clamp(48px,7vw,82px);line-height:.86;margin:18px 0}
+.command-copy p{max-width:420px;color:#999;font-size:13px;line-height:1.9}
+.command-live{display:flex;align-items:center;gap:9px;margin-top:25px;color:#aaa;font:10px monospace;letter-spacing:1.5px}
+.command-live .hud-dot{width:7px;height:7px;border-radius:50%;background:#e82b36;box-shadow:0 0 12px #e82b36}
+.terminal{border:1px solid #383838;background:#090909;box-shadow:0 24px 70px rgba(0,0,0,.4);min-width:0}
+.terminal-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 17px;border-bottom:1px solid #292929;background:#111}
+.terminal-dots{display:flex;gap:6px}.terminal-dots i{width:7px;height:7px;border-radius:50%;background:#454545}.terminal-dots i:first-child{background:#ed252e}
+.terminal-top-label{color:#777;font:9px monospace;letter-spacing:1.5px}
+.terminal-screen{padding:25px;min-height:260px}
+.terminal-command{color:#ff626b;font:11px monospace;letter-spacing:1px;margin-bottom:20px}
+.terminal-screen h3{font-size:clamp(29px,4vw,43px);line-height:.9;margin:0 0 13px}
+.terminal-screen p{color:#969696;font-size:12px;line-height:1.8;margin-bottom:23px;max-width:460px}
+.terminal-readout{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.readout{padding:12px;border:1px solid #272727;background:#0e0e0e;min-width:0}
+.readout span{display:block;color:#666;font:8px monospace;letter-spacing:1px;margin-bottom:8px}
+.readout strong{font:800 17px "Barlow Condensed",sans-serif;color:#eee}
+.terminal-tabs{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #292929}
+.terminal-tab{border:0;border-right:1px solid #292929;background:#111;color:#777;padding:15px 8px;font:800 11px "Barlow Condensed",sans-serif;letter-spacing:1px;cursor:pointer;transition:background .2s,color .2s}
+.terminal-tab:last-child{border-right:0}.terminal-tab[aria-selected="true"]{background:#2a0d10;color:#fff;box-shadow:inset 0 2px #ed252e}
+.terminal-foot{display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-top:1px solid #292929;color:#555;font:9px monospace;letter-spacing:.8px}
+.terminal-foot strong{color:#aaa;font-weight:600}
+@media(max-width:760px){.command-layout{grid-template-columns:1fr;gap:25px}.command-copy{padding:0}.terminal-screen{padding:20px;min-height:245px}}
+@media(max-width:420px){.terminal-readout{grid-template-columns:1fr}.readout{display:flex;justify-content:space-between;align-items:center}.readout span{margin:0}}
+
   </style>
 </head>
 
@@ -1343,6 +1373,7 @@
       <nav class="nav-links" id="nav-links" aria-label="Main navigation">
         <a href="#modes">Combat</a>
         <a href="#operations">Operations</a>
+        <a href="#command">Terminal</a>
         <a href="#launch">Launch</a>
         <a href="#arsenal">Loadouts</a>
         <a href="#intel">Intel</a>
@@ -1563,6 +1594,33 @@
     </section>
 
     
+    
+<section class="section command-section" id="command">
+ <div class="wrap command-layout">
+  <div class="command-copy">
+   <div class="eyebrow">Interactive // command interface</div>
+   <h2>ACCESS THE<br><span class="red">ZAR SYSTEM.</span></h2>
+   <p>Not another static info card. Open the terminal, switch between system files, and inspect the current public briefing for THE ZAR.</p>
+   <div class="command-live"><span class="hud-dot"></span> INTERFACE READY <span style="color:#555">/</span> BUILD 0.1</div>
+  </div>
+  <div class="terminal" aria-label="Interactive THE ZAR command terminal">
+   <div class="terminal-top"><div class="terminal-dots"><i></i><i></i><i></i></div><span class="terminal-top-label">ZAR_OS // PUBLIC ACCESS</span><span class="terminal-top-label">● ENCRYPTED</span></div>
+   <div class="terminal-screen" id="terminal-screen" aria-live="polite">
+    <div class="terminal-command" id="terminal-command">> OPEN_FILE / MISSION_BRIEF</div>
+    <h3 id="terminal-title">MISSION<br><span class="red">BRIEFING.</span></h3>
+    <p id="terminal-description">THE ZAR is a Roblox first-person combat project. The public launch date has not been announced. Check back for confirmed news and deployment information.</p>
+    <div class="terminal-readout"><div class="readout"><span>PROJECT</span><strong>THE ZAR</strong></div><div class="readout"><span>PLATFORM</span><strong>ROBLOX</strong></div><div class="readout"><span>LAUNCH</span><strong id="terminal-launch">PENDING</strong></div></div>
+   </div>
+   <div class="terminal-tabs" role="tablist" aria-label="Terminal files">
+    <button class="terminal-tab" type="button" role="tab" aria-selected="true" data-terminal="mission">01 / BRIEF</button>
+    <button class="terminal-tab" type="button" role="tab" aria-selected="false" data-terminal="systems">02 / SYSTEMS</button>
+    <button class="terminal-tab" type="button" role="tab" aria-selected="false" data-terminal="access">03 / ACCESS</button>
+   </div>
+   <div class="terminal-foot"><span>SESSION: PUBLIC</span><strong id="terminal-status">FILE LOADED</strong><span id="terminal-clock">LOCAL TIME</span></div>
+  </div>
+ </div>
+</section>
+
     <section class="section ops-section" id="operations">
       <div class="wrap">
         <div class="ops-head">
@@ -1839,6 +1897,34 @@
       });
     });
 
+
+
+    // Interactive command terminal — each tab loads a different public briefing.
+    const terminalFiles = {
+      mission: { command: "> OPEN_FILE / MISSION_BRIEF", title: 'MISSION<br><span class="red">BRIEFING.</span>', description: "THE ZAR is a Roblox first-person combat project. The public launch date has not been announced. Check back for confirmed news and deployment information.", project: "THE ZAR", platform: "ROBLOX", launch: "PENDING", status: "FILE LOADED" },
+      systems: { command: "> DIAGNOSTIC / PUBLIC_SYSTEMS", title: 'SYSTEMS<br><span class="red">OVERVIEW.</span>', description: "This public interface is online. Pre-registration connects to the website backend, while launch timing is controlled through the admin panel. Unannounced features are not shown as confirmed.", project: "ONLINE", platform: "CLOUDFLARE", launch: "SYNCED", status: "DIAGNOSTIC COMPLETE" },
+      access: { command: "> CHECK_ACCESS / DEPLOYMENT", title: 'ACCESS<br><span class="red">PROTOCOL.</span>', description: "The launch date is still pending. Join the pre-registration list for launch-related email updates. Registration does not itself grant game access, paid access, or early access.", project: "PUBLIC", platform: "EMAIL LIST", launch: "PENDING", status: "ACCESS: PUBLIC INFO" }
+    };
+    document.querySelectorAll(".terminal-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        const file = terminalFiles[tab.dataset.terminal];
+        if (!file) return;
+        document.querySelectorAll(".terminal-tab").forEach(other => other.setAttribute("aria-selected", String(other === tab)));
+        document.getElementById("terminal-command").textContent = file.command;
+        document.getElementById("terminal-title").innerHTML = file.title;
+        document.getElementById("terminal-description").textContent = file.description;
+        document.querySelector(".readout strong").textContent = file.project;
+        document.querySelectorAll(".readout strong")[1].textContent = file.platform;
+        document.getElementById("terminal-launch").textContent = file.launch;
+        document.getElementById("terminal-status").textContent = file.status;
+        const screen = document.getElementById("terminal-screen");
+        screen.animate([{ opacity: .25, transform: "translateY(5px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 220, easing: "ease-out" });
+      });
+    });
+    const terminalClock = document.getElementById("terminal-clock");
+    function updateTerminalClock() { terminalClock.textContent = new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}); }
+    updateTerminalClock();
+    setInterval(updateTerminalClock, 30000);
 
     // Pre-registration: keeps the existing Cloudflare Worker endpoint.
     const form = document.getElementById("register-form");

@@ -129,6 +129,24 @@ async function ensureTables(env) {
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
   `).run();
+
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS zar_game_settings (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      place_id TEXT NOT NULL DEFAULT '138362141815839',
+      universe_id TEXT NOT NULL DEFAULT '',
+      access_mode TEXT NOT NULL DEFAULT 'code'
+        CHECK (access_mode IN ('code','closed','open')),
+      remember_mode TEXT NOT NULL DEFAULT 'account'
+        CHECK (remember_mode IN ('account','session')),
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `).run();
+  await env.DB.prepare(`
+    INSERT OR IGNORE INTO zar_game_settings
+      (id, place_id, universe_id, access_mode, remember_mode)
+    VALUES (1, '138362141815839', '', 'code', 'account')
+  `).run();
 }
 
 function makeCode() {
@@ -205,6 +223,30 @@ export default {
         return json({ launch_at: result?.launch_at ?? null });
       } catch {
         return json({ message: "Launch settings unavailable." }, 503);
+      }
+    }
+
+    // Roblox server-only configuration endpoint. It never returns the API secret.
+    if (path === "/api/game/config") {
+      if (method !== "GET") return json({ message: "Method not allowed." }, 405);
+      if (!env.GAME_API_KEY) return json({ message: "Game integration is not configured." }, 503);
+      if (request.headers.get("Authorization") !== `Bearer ${env.GAME_API_KEY}`) {
+        return json({ message: "Unauthorized." }, 401);
+      }
+      try {
+        await ensureTables(env);
+        const settings = await env.DB.prepare(
+          "SELECT place_id, universe_id, access_mode, remember_mode, updated_at FROM zar_game_settings WHERE id = 1"
+        ).first();
+        return json({
+          place_id: settings?.place_id || "138362141815839",
+          universe_id: settings?.universe_id || "",
+          access_mode: settings?.access_mode || "code",
+          remember_mode: settings?.remember_mode || "account",
+          updated_at: settings?.updated_at || null
+        });
+      } catch {
+        return json({ message: "Game settings unavailable." }, 503);
       }
     }
 
@@ -522,11 +564,53 @@ export default {
         return json({ ok: true });
       }
 
+      if (path === "/api/admin/game-settings" && method === "GET") {
+        const settings = await env.DB.prepare(
+          "SELECT place_id, universe_id, access_mode, remember_mode, updated_at FROM zar_game_settings WHERE id = 1"
+        ).first();
+        return json({
+          place_id: settings?.place_id || "138362141815839",
+          universe_id: settings?.universe_id || "",
+          access_mode: settings?.access_mode || "code",
+          remember_mode: settings?.remember_mode || "account",
+          updated_at: settings?.updated_at || null
+        });
+      }
+
+      if (path === "/api/admin/game-settings" && method === "POST") {
+        let data;
+        try { data = await readJson(request, 2048); }
+        catch (e) { return json({ message: e.message || "Invalid request." }, 400); }
+        const placeId = cleanText(data.place_id, 24);
+        const universeId = cleanText(data.universe_id, 24);
+        const accessMode = cleanText(data.access_mode, 16);
+        const rememberMode = cleanText(data.remember_mode, 16);
+        if (!/^\d{1,24}$/.test(placeId)) return json({ message: "Enter a valid numeric Roblox Place ID." }, 400);
+        if (universeId && !/^\d{1,24}$/.test(universeId)) return json({ message: "Universe ID must be numeric." }, 400);
+        if (!["code", "closed", "open"].includes(accessMode)) return json({ message: "Choose a valid access mode." }, 400);
+        if (!["account", "session"].includes(rememberMode)) return json({ message: "Choose a valid authorization duration." }, 400);
+        await env.DB.prepare(`
+          UPDATE zar_game_settings
+          SET place_id = ?, universe_id = ?, access_mode = ?, remember_mode = ?,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = 1
+        `).bind(placeId, universeId, accessMode, rememberMode).run();
+        return json({ ok: true, place_id: placeId, universe_id: universeId, access_mode: accessMode, remember_mode: rememberMode });
+      }
+
       if (path === "/api/admin/game-status" && method === "GET") {
+        const settings = await env.DB.prepare(
+          "SELECT place_id, universe_id, access_mode, remember_mode, updated_at FROM zar_game_settings WHERE id = 1"
+        ).first();
         return json({
           endpoint: "/api/game/redeem",
+          config_endpoint: "/api/game/config",
           configured: Boolean(env.GAME_API_KEY),
-          note: "Use this endpoint only from a trusted Roblox server script."
+          place_id: settings?.place_id || "138362141815839",
+          universe_id: settings?.universe_id || "",
+          access_mode: settings?.access_mode || "code",
+          remember_mode: settings?.remember_mode || "account",
+          note: "Use these endpoints only from a trusted Roblox server script."
         });
       }
 

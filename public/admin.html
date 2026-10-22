@@ -433,7 +433,7 @@ function showView(name) {
   loadView(name).catch(e => toast(e.message));
 }
 
-$(.nav button").forEach(btn => btn.addEventListener("click", () => { showView(btn.dataset.view); if(typeof zarActivity==="function") zarActivity("Opened "+btn.textContent.trim()); }));
+$(".nav button").forEach(btn => btn.addEventListener("click", () => { showView(btn.dataset.view); if(typeof zarActivity==="function") zarActivity("Opened "+btn.textContent.trim()); }));
 $$("[data-go]").forEach(btn => btn.addEventListener("click", () => showView(btn.dataset.go)));
 
 $("#loginForm").addEventListener("submit", async e => {

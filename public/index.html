@@ -1355,7 +1355,9 @@
 @media(max-width:760px){.command-layout{grid-template-columns:1fr;gap:25px}.command-copy{padding:0}.terminal-screen{padding:20px;min-height:245px}}
 @media(max-width:420px){.terminal-readout{grid-template-columns:1fr}.readout{display:flex;justify-content:space-between;align-items:center}.readout span{margin:0}}
 
-  </style>
+  
+.operator-tools-section{padding:90px 0;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)}.operator-tools-section .section-inner{width:min(1180px,calc(100% - 40px));margin:auto}.operator-tools-section .section-kicker{font-size:11px;letter-spacing:2.5px;color:#ff4655;margin-bottom:18px}.operator-tools-section .section-heading{display:flex;align-items:end;justify-content:space-between;gap:28px;margin-bottom:28px}.operator-tools-section .section-heading h2{font-size:clamp(38px,6vw,70px);line-height:.95;margin:0;letter-spacing:-2px}.operator-tools-section .section-heading p{max-width:390px;color:#a6a9b2;line-height:1.7}.operator-tool-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.operator-tool{min-height:250px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.12);padding:22px;display:flex;flex-direction:column;align-items:flex-start;gap:12px}.operator-tool-no{font-size:10px;letter-spacing:1.6px;color:#ff4655}.operator-tool h3{font-size:19px;margin:4px 0}.operator-tool p{font-size:13px;line-height:1.65;color:#a6a9b2;flex:1}.operator-tool .btn{font:inherit;font-size:11px;letter-spacing:.7px;cursor:pointer}.operator-tool small{font-size:11px;color:#d2d5dd;line-height:1.4}.operator-tool .btn-primary{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;padding:11px 14px;background:#ff3046;color:white;border:0}.operator-tools-section .accent{color:#ff3046}@media(max-width:1000px){.operator-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.operator-tools-section{padding:60px 0}.operator-tools-section .section-heading{display:block}.operator-tool-grid{grid-template-columns:1fr}.operator-tool{min-height:200px}}
+</style>
 </head>
 
 <body>
@@ -1717,7 +1719,22 @@
       </div>
     </section>
 
-    <section class="section register-section" id="register">
+    
+<section id="operator-tools" class="section operator-tools-section">
+  <div class="section-inner">
+    <div class="section-kicker">FIELD UTILITIES // 05 TOOLS</div>
+    <div class="section-heading"><h2>OPERATOR<br><span class="accent">TOOLS.</span></h2><p>Quick access to the game, launch information and pre-registration. No fake player counts or made-up intel.</p></div>
+    <div class="operator-tool-grid">
+      <article class="operator-tool"><span class="operator-tool-no">01 / GAME</span><h3>OPEN THE ZAR</h3><p>Jump straight to the Roblox experience page.</p><a class="btn btn-primary" href="https://www.roblox.com/games/138362141815839/The-ZAR" target="_blank" rel="noopener">OPEN GAME ↗</a></article>
+      <article class="operator-tool"><span class="operator-tool-no">02 / IDENTIFIER</span><h3>PLACE ID</h3><p>Copy the official Roblox Place ID for setup or support.</p><button class="btn" id="copyZarPlace">COPY 138362141815839</button><small id="placeCopyStatus" aria-live="polite"></small></article>
+      <article class="operator-tool"><span class="operator-tool-no">03 / LAUNCH INTEL</span><h3>CHECK LAUNCH</h3><p>Read the current launch status from the website backend.</p><button class="btn" id="checkZarLaunch">CHECK STATUS ↻</button><small id="zarLaunchResult" aria-live="polite">Status not checked yet.</small></article>
+      <article class="operator-tool"><span class="operator-tool-no">04 / DEPLOYMENT</span><h3>GET ON THE LIST</h3><p>Register for launch updates when the gates are ready.</p><button class="btn btn-primary" id="goZarRegister">PRE-REGISTER ↓</button></article>
+      <article class="operator-tool"><span class="operator-tool-no">05 / TRANSMISSION</span><h3>SHARE THE SITE</h3><p>Send a friend the official THE ZAR pre-launch page.</p><button class="btn" id="shareZarSite">SHARE WEBSITE ↗</button><small id="shareZarStatus" aria-live="polite"></small></article>
+    </div>
+  </div>
+</section>
+
+<section class="section register-section" id="register">
       <div class="wrap register-layout">
         <div class="register-copy">
           <div class="eyebrow">Your deployment starts here</div>
@@ -2060,6 +2077,12 @@
     loadLaunchDate();
     setInterval(showCountdown, 1000);
     setInterval(loadLaunchDate, 60000);
-  </script>
+  
+document.getElementById("copyZarPlace")?.addEventListener("click",async()=>{try{await navigator.clipboard.writeText("138362141815839");document.getElementById("placeCopyStatus").textContent="Place ID copied."}catch{document.getElementById("placeCopyStatus").textContent="Copy unavailable in this browser."}});
+document.getElementById("checkZarLaunch")?.addEventListener("click",async()=>{const out=document.getElementById("zarLaunchResult");out.textContent="Checking…";try{const r=await fetch("/api/launch",{cache:"no-store"});if(!r.ok)throw new Error();const d=await r.json();if(d.launch_at){const date=new Date(d.launch_at);out.textContent=Number.isNaN(date.getTime())?"Launch date unavailable.":"Scheduled: "+date.toLocaleString()}else{out.textContent="LAUNCHING SOON — date not announced."}}catch{out.textContent="Could not reach launch status right now."}});
+document.getElementById("goZarRegister")?.addEventListener("click",()=>document.getElementById("register")?.scrollIntoView({behavior:"smooth",block:"start"}));
+document.getElementById("shareZarSite")?.addEventListener("click",async()=>{const out=document.getElementById("shareZarStatus");try{if(navigator.share){await navigator.share({title:"THE ZAR",text:"Check out THE ZAR — a Roblox game coming soon.",url:location.origin});out.textContent="Share sheet opened."}else{await navigator.clipboard.writeText(location.origin);out.textContent="Website link copied."}}catch{out.textContent="Sharing cancelled or unavailable."}});
+
+</script>
 </body>
 </html>

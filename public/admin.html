@@ -246,6 +246,28 @@ Content-Type: application/json
           <div class="actions"><button class="btn" id="refreshGame">Check integration</button><span id="gameStatus" class="muted small"></span></div>
         </div>
         <div class="card">
+          <div class="section-head"><div><h2>Roblox Setup</h2><p>Configure how players enter THE ZAR</p></div></div>
+          <form id="robloxSettingsForm" class="form-grid">
+            <label>Roblox Place ID<input name="place_id" inputmode="numeric" required value="138362141815839"></label>
+            <label>Universe ID (optional)<input name="universe_id" inputmode="numeric" placeholder="Leave blank if unknown"></label>
+            <label>Access mode
+              <select name="access_mode">
+                <option value="code">Require an access code</option>
+                <option value="closed">Closed — nobody can enter</option>
+                <option value="open">Open — no code required</option>
+              </select>
+            </label>
+            <label>Remember approved access
+              <select name="remember_mode">
+                <option value="account">Remember per Roblox account</option>
+                <option value="session">This server session only</option>
+              </select>
+            </label>
+            <div class="actions"><button class="btn btn-red" type="submit">Save Roblox Setup</button><span id="robloxSaveStatus" class="muted small"></span></div>
+          </form>
+          <div class="notice">These settings are saved to your website and exposed only to authenticated Roblox server scripts. The Roblox game still needs a server Script and screen LocalScript that read these settings before they can enforce the gate.</div>
+        </div>
+        <div class="card">
           <h2 style="margin-top:0">Response example</h2>
           <pre>{
   "ok": true,
@@ -580,11 +602,35 @@ async function loadRegistrations() {
 $("#reloadRegs").addEventListener("click", () => loadRegistrations().catch(e => toast(e.message)));
 
 async function loadGame() {
-  const data = await api("/api/admin/game-status");
+  const [data, settings] = await Promise.all([
+    api("/api/admin/game-status"), api("/api/admin/game-settings")
+  ]);
   $("#gameStatus").textContent = data.configured ? "API secret configured." : "GAME_API_KEY secret is missing.";
   $("#gameStatus").style.color = data.configured ? "#7ce5a4" : "#ff858b";
   $("#dashboardGame").textContent = data.configured ? "API key configured" : "Setup required";
+  const form = $("#robloxSettingsForm");
+  form.elements.place_id.value = settings.place_id || "138362141815839";
+  form.elements.universe_id.value = settings.universe_id || "";
+  form.elements.access_mode.value = settings.access_mode || "code";
+  form.elements.remember_mode.value = settings.remember_mode || "account";
+  $("#robloxSaveStatus").textContent = "Settings loaded.";
 }
+$("#robloxSettingsForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const form = e.currentTarget;
+  const data = Object.fromEntries(new FormData(form).entries());
+  const status = $("#robloxSaveStatus");
+  status.textContent = "Saving…";
+  try {
+    await api("/api/admin/game-settings", {method:"POST", body:JSON.stringify(data)});
+    status.textContent = "Saved successfully.";
+    toast("Roblox Setup saved.");
+    await loadGame();
+  } catch (error) {
+    status.textContent = error.message;
+    toast(error.message);
+  }
+});
 $("#refreshGame").addEventListener("click", () => loadGame().catch(e => toast(e.message)));
 
 (async function init() {

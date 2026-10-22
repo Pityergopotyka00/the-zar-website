@@ -1287,6 +1287,44 @@
     }
     @media(prefers-reduced-motion:reduce){.operator-art,.ring-one{animation:none}}
 
+  
+    /* NEW DROP: operations board + development roadmap */
+    .ops-section{background:#080808;border-block:1px solid var(--line);overflow:hidden}
+    .ops-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:38px}
+    .ops-head .section-heading{margin-bottom:0}
+    .ops-stamp{border:1px solid rgba(237,37,46,.45);padding:12px 15px;color:#ff858a;font:800 10px monospace;letter-spacing:1.5px;white-space:nowrap}
+    .ops-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+    .ops-main{position:relative;min-height:390px;padding:30px;border:1px solid #303030;background:radial-gradient(ellipse at 82% 25%,rgba(237,37,46,.2),transparent 40%),linear-gradient(135deg,#171717,#0b0b0b);overflow:hidden}
+    .ops-main:after{content:"Z";position:absolute;right:3%;top:2%;font:900 clamp(190px,28vw,340px)/1 "Barlow Condensed",sans-serif;color:rgba(237,37,46,.09);pointer-events:none}
+    .ops-meta{display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+    .ops-pill{padding:7px 9px;border:1px solid #3a3a3a;background:#101010;color:#aaa;font:800 9px monospace;letter-spacing:1px}
+    .ops-pill.red-pill{border-color:rgba(237,37,46,.5);color:#ff777e}
+    .ops-main h3{position:relative;z-index:1;margin:65px 0 10px;font-size:clamp(40px,6vw,70px);line-height:.85}
+    .ops-main p{position:relative;z-index:1;max-width:410px;color:#999;font-size:12px;line-height:1.9}
+    .ops-coordinates{position:absolute;bottom:24px;right:25px;color:#555;font:10px monospace;letter-spacing:1px}
+    .ops-side{display:grid;gap:12px}
+    .ops-tile{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:14px;padding:20px;border:1px solid #292929;background:#101010;transition:transform .2s,border-color .2s}
+    .ops-tile:hover{transform:translateX(4px);border-color:rgba(237,37,46,.6)}
+    .ops-tile-icon{width:42px;height:42px;display:grid;place-items:center;background:#1b1011;border:1px solid #482024;color:var(--red);font-size:20px}
+    .ops-tile h4{margin:0 0 6px;font:800 20px "Barlow Condensed",sans-serif}
+    .ops-tile p{margin:0;color:#777;font-size:10px;line-height:1.6}
+    .ops-arrow{color:#777;font-size:20px}
+    .roadmap{margin-top:18px;display:grid;grid-template-columns:repeat(4,1fr);border:1px solid #292929}
+    .roadmap-step{padding:21px;border-right:1px solid #292929;background:#0d0d0d}
+    .roadmap-step:last-child{border-right:0}
+    .roadmap-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:20px}
+    .roadmap-no{font:800 25px "Barlow Condensed",sans-serif;color:var(--red)}
+    .roadmap-status{font:800 8px monospace;color:#888;letter-spacing:1px}
+    .roadmap-step h4{margin:0 0 8px;font:800 19px "Barlow Condensed",sans-serif}
+    .roadmap-step p{margin:0;color:#777;font-size:10px;line-height:1.7}
+    .roadmap-step.current{background:linear-gradient(180deg,rgba(237,37,46,.1),#0d0d0d 70%)}
+    .roadmap-step.current .roadmap-status{color:#ff777e}
+    .roadmap-disclaimer{margin:14px 0 0;color:#555;font-size:10px;line-height:1.7}
+    .field-note{display:flex;align-items:center;gap:10px;margin-top:26px;padding:14px 16px;border-left:2px solid var(--red);background:#111;color:#888;font-size:11px;line-height:1.7}
+    .field-note strong{color:#eee}
+    @media(max-width:760px){.ops-head{align-items:flex-start;flex-direction:column}.ops-grid{grid-template-columns:1fr}.ops-main{min-height:330px}.roadmap{grid-template-columns:repeat(2,1fr)}.roadmap-step:nth-child(2){border-right:0}.roadmap-step:nth-child(-n+2){border-bottom:1px solid #292929}}
+    @media(max-width:440px){.ops-tile{grid-template-columns:36px 1fr auto;padding:15px;gap:10px}.ops-tile-icon{width:36px;height:36px}.roadmap-step{padding:15px}}
+  
   </style>
 </head>
 
@@ -1304,6 +1342,7 @@
       <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Open navigation" aria-expanded="false">☰</button>
       <nav class="nav-links" id="nav-links" aria-label="Main navigation">
         <a href="#modes">Combat</a>
+        <a href="#operations">Operations</a>
         <a href="#launch">Launch</a>
         <a href="#arsenal">Loadouts</a>
         <a href="#intel">Intel</a>
@@ -1523,6 +1562,42 @@
       </div>
     </section>
 
+    
+    <section class="section ops-section" id="operations">
+      <div class="wrap">
+        <div class="ops-head">
+          <div class="section-heading">
+            <div class="eyebrow">New intel // field operations</div>
+            <h2>THE NEXT DROP.<br><span class="red">YOUR NEXT MOVE.</span></h2>
+            <p>A deeper look at the world of THE ZAR — combat concepts, the current launch status, and the path toward deployment.</p>
+          </div>
+          <div class="ops-stamp">FIELD FILE // Z-001</div>
+        </div>
+        <div class="ops-grid">
+          <article class="ops-main">
+            <div class="ops-meta"><span class="ops-pill red-pill">OPERATION: ZAR</span><span class="ops-pill">ROBLOX // FPS</span><span class="ops-pill">IN DEVELOPMENT</span></div>
+            <h3>ENTER THE<br><span class="red">HOT ZONE.</span></h3>
+            <p>Read the room. Hold your angle. Make the next move count. THE ZAR is a first-person combat project being prepared for its next public chapter.</p>
+            <a class="button" href="#register">GET LAUNCH INTEL <span>↗</span></a>
+            <span class="ops-coordinates">SECTOR 00 / STATUS UNKNOWN</span>
+          </article>
+          <div class="ops-side">
+            <a class="ops-tile" href="#arsenal"><span class="ops-tile-icon">⌖</span><span><h4>ARMORY DATABASE</h4><p>Explore the current loadout concepts and combat roles.</p></span><span class="ops-arrow">↗</span></a>
+            <a class="ops-tile" href="#launch"><span class="ops-tile-icon">◷</span><span><h4>LAUNCH MONITOR</h4><p>Check the live launch status. No date is promised until announced.</p></span><span class="ops-arrow">↗</span></a>
+            <a class="ops-tile" href="#intel"><span class="ops-tile-icon">⌁</span><span><h4>INTEL ARCHIVE</h4><p>Get the answers before you join the operation.</p></span><span class="ops-arrow">↗</span></a>
+          </div>
+        </div>
+        <div class="roadmap" aria-label="Development overview">
+          <article class="roadmap-step current"><div class="roadmap-top"><span class="roadmap-no">01</span><span class="roadmap-status">CURRENT</span></div><h4>PRE-LAUNCH</h4><p>Prepare the website, collect interest, and share confirmed updates.</p></article>
+          <article class="roadmap-step"><div class="roadmap-top"><span class="roadmap-no">02</span><span class="roadmap-status">UP NEXT</span></div><h4>REVEALS</h4><p>More official details when the team is ready to show them.</p></article>
+          <article class="roadmap-step"><div class="roadmap-top"><span class="roadmap-no">03</span><span class="roadmap-status">PLANNED</span></div><h4>DEPLOYMENT</h4><p>Launch information will be published here once confirmed.</p></article>
+          <article class="roadmap-step"><div class="roadmap-top"><span class="roadmap-no">04</span><span class="roadmap-status">FUTURE</span></div><h4>WHAT'S NEXT</h4><p>Future updates depend on development and the official roadmap.</p></article>
+        </div>
+        <p class="roadmap-disclaimer">Roadmap labels are a high-level overview, not guaranteed dates or promises of unreleased features.</p>
+        <div class="field-note"><span class="red">◆</span><span><strong>FIELD NOTE:</strong> Launch date is still undecided. The live countdown stays hidden until a date is officially set in the admin panel.</span></div>
+      </div>
+    </section>
+  
     <section class="section features-section">
       <div class="wrap features-layout">
         <div class="feature-visual" aria-label="THE ZAR insignia">
@@ -1654,6 +1729,7 @@
 
       <nav class="footer-links" aria-label="Footer navigation">
         <a href="#modes">Combat</a>
+        <a href="#operations">Operations</a>
         <a href="#launch">Launch</a>
         <a href="#register">Pre-register</a>
       </nav>

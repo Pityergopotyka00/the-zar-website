@@ -531,7 +531,8 @@ async function loadCodes(type) {
 function setupCodeForm(formId, type, resultId) {
   $(formId).addEventListener("submit", async e => {
     e.preventDefault();
-    const form = new FormData(e.currentTarget);
+    const formElement = e.currentTarget;
+    const form = new FormData(formElement);
     const expiry = form.get("expires_at");
     const payload = {
       type,
@@ -549,7 +550,7 @@ function setupCodeForm(formId, type, resultId) {
         result.codes.map(c => "<code>" + escapeHtml(c) + "</code>").join("<br>");
       box.classList.remove("hidden");
       toast(result.codes.length + " code(s) generated.");
-      e.currentTarget.reset();
+      formElement.reset();
       await loadCodes(type);
       if (type === "preorder") $("#view-codes").querySelector('[name="max_uses"]').value = "1";
       else $("#view-giveaways").querySelector('[name="max_uses"]').value = "1";
@@ -595,7 +596,8 @@ async function loadOrders() {
 
 $("#orderForm").addEventListener("submit", async e => {
   e.preventDefault();
-  const f = new FormData(e.currentTarget);
+  const formElement = e.currentTarget;
+  const f = new FormData(formElement);
   try {
     const result = await api("/api/admin/orders", {
       method:"POST",
@@ -604,7 +606,7 @@ $("#orderForm").addEventListener("submit", async e => {
       })
     });
     toast("Order created: " + result.order_ref);
-    e.currentTarget.reset();
+    formElement.reset();
     await loadOrders();
     await loadDashboard();
   } catch (err) { toast(err.message); }
@@ -697,7 +699,7 @@ $("#refreshGame").addEventListener("click", () => loadGame().catch(e => toast(e.
 function csvDownload(filename, rows) {
   const quote = v => '"' + String(v ?? "").replace(/"/g,'""') + '"';
   const csv = rows.map(row => row.map(quote).join(",")).join("\r\n");
-  const url = URL.createObjectURL(new Blob(["\\ufeff",csv],{type:"text/csv;charset=utf-8"}));
+  const url = URL.createObjectURL(new Blob(["\ufeff",csv],{type:"text/csv;charset=utf-8"}));
   const link = document.createElement("a"); link.href=url; link.download=filename;
   document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
   toast("Export downloaded: " + filename);

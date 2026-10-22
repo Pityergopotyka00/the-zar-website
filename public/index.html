@@ -967,6 +967,146 @@
         transition-duration: .01ms !important;
       }
     }
+
+    /* THE ZAR // cinematic homepage upgrade */
+    :root {
+      --bg: #070708;
+      --panel: #101012;
+      --panel-2: #18181b;
+      --red: #ff2633;
+      --red-bright: #ff4b55;
+      --line: rgba(255,255,255,.105);
+    }
+    body {
+      background-image: radial-gradient(ellipse at 50% -20%, rgba(255,30,45,.11), transparent 48%);
+    }
+    header {
+      background: rgba(7,7,8,.78);
+      box-shadow: 0 10px 45px rgba(0,0,0,.18);
+    }
+    .brand { letter-spacing: 2.5px; }
+    .brand-mark {
+      box-shadow: 0 0 25px rgba(255,38,51,.24);
+      transform: skew(-4deg);
+    }
+    .nav-links a { position: relative; transition: color .2s; }
+    .nav-links a::after {
+      content: ""; position: absolute; left: 0; right: 100%; bottom: -9px;
+      height: 2px; background: var(--red); transition: right .22s;
+    }
+    .nav-links a:hover::after { right: 0; }
+    .button {
+      position: relative; isolation: isolate;
+      box-shadow: 0 8px 30px rgba(255,38,51,.13);
+      transition: background .2s, transform .2s, box-shadow .2s, border-color .2s;
+    }
+    .button:hover { box-shadow: 0 10px 36px rgba(255,38,51,.3); }
+    .button::before {
+      content: ""; position: absolute; inset: 0; z-index: -1;
+      background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,.16) 48%, transparent 70%);
+      transform: translateX(-130%); transition: transform .55s;
+    }
+    .button:hover::before { transform: translateX(130%); }
+    .hero {
+      min-height: min(850px, calc(100svh - 80px));
+      background:
+        linear-gradient(90deg, #070708 0%, rgba(7,7,8,.93) 26%, rgba(7,7,8,.55) 58%, rgba(7,7,8,.25) 100%),
+        linear-gradient(0deg, #070708 0%, transparent 40%),
+        url("https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=2200&q=90") center 42% / cover,
+        #111;
+    }
+    .hero::before {
+      background:
+        radial-gradient(ellipse at 78% 48%, rgba(255,26,43,.25), transparent 34%),
+        linear-gradient(115deg, transparent 48%, rgba(255,38,51,.12) 48.1%, transparent 48.6%);
+      animation: zarAtmosphere 8s ease-in-out infinite alternate;
+    }
+    @keyframes zarAtmosphere { from { opacity: .65; } to { opacity: 1; } }
+    .hero::after {
+      right: 7%; color: rgba(255,38,51,.055);
+      -webkit-text-stroke: 1px rgba(255,38,51,.22);
+      text-shadow: 0 0 90px rgba(255,38,51,.08);
+    }
+    .hero-content { max-width: 850px; padding-top: 88px; padding-bottom: 112px; }
+    .live-label {
+      border-color: rgba(255,38,51,.65);
+      background: rgba(12,8,9,.68);
+      box-shadow: 0 0 35px rgba(255,38,51,.08), inset 0 0 22px rgba(255,38,51,.04);
+    }
+    .hero h1 {
+      font-size: clamp(86px, 14vw, 178px);
+      letter-spacing: -3px;
+      text-shadow: 0 8px 55px rgba(0,0,0,.45);
+    }
+    .hero h1 span {
+      text-shadow: 0 0 42px rgba(255,38,51,.15);
+    }
+    .hero-subtitle { max-width: 490px; font-size: 14px; color: #d0cdd0; }
+    .hero-code { padding-top: 16px; border-top: 1px solid rgba(255,255,255,.12); max-width: 365px; }
+    .hero-corner { color: rgba(255,255,255,.62); }
+    .intel-strip {
+      background: linear-gradient(90deg, #0b0b0d, #131012 50%, #0b0b0d);
+      box-shadow: 0 15px 45px rgba(0,0,0,.2);
+    }
+    .intel-item { position: relative; }
+    .intel-item::after {
+      content: ""; position: absolute; left: 26px; right: 26px; bottom: 0;
+      height: 1px; background: linear-gradient(90deg, transparent, rgba(255,38,51,.45), transparent);
+      opacity: 0; transition: opacity .25s;
+    }
+    .intel-item:hover::after { opacity: 1; }
+    .intel-icon { box-shadow: inset 0 0 18px rgba(255,38,51,.08); }
+    .section-heading h2, .launch-top h2, .register-copy h2 { letter-spacing: -1px; }
+    .launch-panel {
+      border-color: rgba(255,38,51,.4);
+      background:
+        radial-gradient(ellipse at 100% 0%, rgba(255,38,51,.13), transparent 42%),
+        linear-gradient(135deg, #171113, #0b0b0d 62%);
+      box-shadow: 0 25px 100px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.035);
+    }
+    .time-box {
+      border-color: rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(0,0,0,.38));
+      transition: border-color .25s, transform .25s;
+    }
+    .time-box:hover { border-color: rgba(255,38,51,.45); transform: translateY(-3px); }
+    .time-number { text-shadow: 0 0 28px rgba(255,38,51,.12); }
+    .mode-card {
+      min-height: 330px;
+      border-color: rgba(255,255,255,.11);
+      background:
+        linear-gradient(0deg, rgba(0,0,0,.98), rgba(0,0,0,.14)),
+        radial-gradient(ellipse at 75% 20%, rgba(255,38,51,.27), transparent 55%),
+        linear-gradient(135deg, #1b1718, #101012);
+      box-shadow: 0 16px 50px rgba(0,0,0,.12);
+    }
+    .mode-card:hover {
+      box-shadow: 0 18px 55px rgba(255,38,51,.08);
+      transform: translateY(-7px);
+    }
+    .mode-symbol { box-shadow: inset 0 0 20px rgba(255,38,51,.08); }
+    .feature-visual {
+      border-color: rgba(255,38,51,.34);
+      box-shadow: inset 0 0 80px rgba(255,38,51,.04), 0 20px 65px rgba(0,0,0,.22);
+    }
+    .feature-visual::before { animation: zarRotate 28s linear infinite; }
+    @keyframes zarRotate { to { transform: rotate(405deg); } }
+    .feature-row { transition: padding-left .22s, border-color .22s; }
+    .feature-row:hover { padding-left: 8px; border-color: rgba(255,38,51,.35); }
+    .register-card {
+      border-color: rgba(255,38,51,.4);
+      box-shadow: 0 25px 90px rgba(0,0,0,.36), 0 0 55px rgba(255,38,51,.035);
+    }
+    .email-input:focus { box-shadow: 0 0 0 3px rgba(255,38,51,.1); }
+    .admin-shield:hover { box-shadow: 0 0 22px rgba(255,38,51,.24); }
+    ::selection { color: white; background: #b91220; }
+    @media (max-width: 560px) {
+      .hero { min-height: 650px; }
+      .hero h1 { letter-spacing: -1.5px; }
+      .hero-content { padding-top: 75px; }
+      .mode-card, .mode-card:last-child { min-height: 260px; }
+    }
+
   </style>
 </head>
 

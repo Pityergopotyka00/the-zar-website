@@ -29,11 +29,8 @@ function fromBase64url(value) {
 
 async function sign(value, secret) {
   const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign", "verify"]
+    "raw", encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
   );
   return new Uint8Array(
     await crypto.subtle.sign("HMAC", key, encoder.encode(value))
@@ -60,7 +57,6 @@ async function validSession(request, secret) {
   try {
     const expected = await sign(parts[0], secret);
     const supplied = fromBase64url(parts[1]);
-
     if (expected.length !== supplied.length) return false;
 
     let difference = 0;
@@ -83,7 +79,17 @@ function sameOrigin(request, url) {
   return request.headers.get("Origin") === url.origin;
 }
 
-async function ensureSettingsTable(env) {
+async function readJson(request, limit = 4096) {
+  if (!request.headers.get("content-type")?.toLowerCase()
+    .includes("application/json")) {
+    throw new Error("Send JSON data.");
+  }
+  const body = await request.text();
+  if (body.length > limit) throw new Error("Request too large.");
+  return JSON.parse(body);
+}
+
+async function ensureTables(env) {
   await env.DB.prepare(`
     CREATE TABLE IF NOT EXISTS site_settings (
       id INTEGER PRIMARY KEY CHECK (id = 1),
@@ -93,89 +99,106 @@ async function ensureSettingsTable(env) {
   `).run();
 
   await env.DB.prepare(`
-    INSERT OR IGNORE INTO site_settings (id, launch_at)
-    VALUES (1, NULL)
+    INSERT OR IGNORE INTO site_settings (id, launch_at) VALUES (1, NULL)
   `).run();
+
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS zar_codes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      code TEXT NOT NULL UNIQUE,
+      type TEXT NOT NULL CHECK (type IN ('preorder','giveaway')),
+      label TEXT NOT NULL DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'active'
+        CHECK (status IN ('active','disabled')),
+      max_uses INTEGER NOT NULL DEFAULT 1,
+      uses INTEGER NOT NULL DEFAULT 0,
+      expires_at TEXT,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `).run();
+
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS zar_orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_ref TEXT NOT NULL UNIQUE,
+      email TEXT NOT NULL,
+      product TEXT NOT NULL DEFAULT 'The ZAR Early Access',
+      status TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending','paid','fulfilled','cancelled','refunded')),
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `).run();
+}
+
+function makeCode() {
+  const bytes = crypto.getRandomValues(new Uint8Array(10));
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let out = "";
+  for (const b of bytes) out += alphabet[b % alphabet.length];
+  return "ZAR-" + out.slice(0, 5) + "-" + out.slice(5);
+}
+
+function makeRef() {
+  return "ZAR-" + crypto.randomUUID().replaceAll("-", "").slice(0, 12).toUpperCase();
+}
+
+function cleanText(value, max = 160) {
+  return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const path = url.pathname;
+    const method = request.method;
 
     if (path === "/admin" || path === "/admin/") {
-      return env.ASSETS.fetch(
-        new Request(new URL("/admin.html", url), request)
-      );
+      return env.ASSETS.fetch(new Request(new URL("/admin.html", url), request));
     }
 
+    // Public pre-registration
     if (path === "/api/register") {
-      if (request.method !== "POST") {
-        return json({ message: "Method not allowed." }, 405);
-      }
-
-      if (!request.headers.get("content-type")?.toLowerCase()
-        .includes("application/json")) {
-        return json({ message: "Invalid request." }, 415);
-      }
+      if (method !== "POST") return json({ message: "Method not allowed." }, 405);
 
       let data;
       try {
-        const body = await request.text();
-        if (body.length > 4096) {
-          return json({ message: "Request too large." }, 413);
-        }
-        data = JSON.parse(body);
-      } catch {
-        return json({ message: "Invalid request." }, 400);
+        data = await readJson(request);
+      } catch (e) {
+        return json({ message: e.message || "Invalid request." }, 400);
       }
 
       if (typeof data.website === "string" && data.website.trim()) {
-        return json({
-          ok: true,
-          message: "Thanks for your interest in The ZAR!"
-        });
+        return json({ ok: true, message: "Thanks for your interest in The ZAR!" });
       }
-
       if (data.consent !== true) {
         return json({ message: "Please confirm your consent first." }, 400);
       }
-
       if (typeof data.email !== "string") {
         return json({ message: "Please enter a valid email." }, 400);
       }
 
       const email = data.email.trim().toLowerCase();
-      if (
-        email.length > 254 ||
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-      ) {
+      if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         return json({ message: "Please enter a valid email." }, 400);
       }
-
-      if (!env.DB) {
-        return json({ message: "Registration is temporarily unavailable." }, 503);
-      }
+      if (!env.DB) return json({ message: "Registration unavailable." }, 503);
 
       try {
         await env.DB.prepare(`
           INSERT INTO registrations (email, consent)
-          VALUES (?, 1)
-          ON CONFLICT(email) DO NOTHING
+          VALUES (?, 1) ON CONFLICT(email) DO NOTHING
         `).bind(email).run();
-
-        return json({
-          ok: true,
-          message: "Thanks for your interest in The ZAR!"
-        });
+        return json({ ok: true, message: "Thanks for your interest in The ZAR!" });
       } catch {
-        return json({ message: "Registration is temporarily unavailable." }, 503);
+        return json({ message: "Registration unavailable." }, 503);
       }
     }
 
-    if (path === "/api/launch" && request.method === "GET") {
+    // Public launch countdown API
+    if (path === "/api/launch" && method === "GET") {
       try {
-        await ensureSettingsTable(env);
+        await ensureTables(env);
         const result = await env.DB.prepare(
           "SELECT launch_at FROM site_settings WHERE id = 1"
         ).first();
@@ -185,44 +208,90 @@ export default {
       }
     }
 
+    // Roblox server-to-server code redemption.
+    // Set GAME_API_KEY as a Worker secret; never put it in a LocalScript.
+    if (path === "/api/game/redeem") {
+      if (method !== "POST") return json({ message: "Method not allowed." }, 405);
+      if (!env.GAME_API_KEY) {
+        return json({ message: "Game integration is not configured." }, 503);
+      }
+      if (request.headers.get("Authorization") !== `Bearer ${env.GAME_API_KEY}`) {
+        return json({ message: "Unauthorized." }, 401);
+      }
+
+      let data;
+      try {
+        data = await readJson(request, 2048);
+      } catch (e) {
+        return json({ message: e.message || "Invalid request." }, 400);
+      }
+
+      const code = cleanText(data.code, 40).toUpperCase();
+      if (!code) return json({ message: "Enter a code." }, 400);
+
+      try {
+        await ensureTables(env);
+        const now = new Date().toISOString();
+
+        // A single conditional update prevents a code from exceeding its use limit.
+        const result = await env.DB.prepare(`
+          UPDATE zar_codes
+          SET uses = uses + 1
+          WHERE code = ?
+            AND status = 'active'
+            AND uses < max_uses
+            AND (expires_at IS NULL OR expires_at > ?)
+        `).bind(code, now).run();
+
+        if (!result.meta || result.meta.changes !== 1) {
+          return json({ ok: false, message: "Invalid, expired, disabled, or already-used code." }, 400);
+        }
+
+        const redeemed = await env.DB.prepare(
+          "SELECT type, label FROM zar_codes WHERE code = ?"
+        ).bind(code).first();
+
+        return json({
+          ok: true,
+          type: redeemed.type,
+          reward: redeemed.label || (redeemed.type === "giveaway" ? "Giveaway reward" : "Early access")
+        });
+      } catch {
+        return json({ message: "Code redemption unavailable." }, 503);
+      }
+    }
+
+    // Admin API
     if (path.startsWith("/api/admin/")) {
       if (!env.ADMIN_PASSWORD || !env.SESSION_SECRET || !env.DB) {
         return json({ message: "Admin configuration is incomplete." }, 503);
       }
 
-      if (request.method !== "GET" && !sameOrigin(request, url)) {
+      if (method !== "GET" && !sameOrigin(request, url)) {
         return json({ message: "Request rejected." }, 403);
       }
 
-      if (path === "/api/admin/login" && request.method === "POST") {
+      if (path === "/api/admin/login" && method === "POST") {
         let data;
         try {
-          const body = await request.text();
-          if (body.length > 2048) return json({ message: "Request too large." }, 413);
-          data = JSON.parse(body);
-        } catch {
-          return json({ message: "Invalid request." }, 400);
+          data = await readJson(request, 2048);
+        } catch (e) {
+          return json({ message: e.message || "Invalid request." }, 400);
         }
 
-        if (
-          typeof data.password !== "string" ||
-          data.password.length > 1024 ||
-          data.password !== env.ADMIN_PASSWORD
-        ) {
+        if (typeof data.password !== "string" ||
+            data.password.length > 1024 ||
+            data.password !== env.ADMIN_PASSWORD) {
           return json({ message: "Incorrect password." }, 401);
         }
 
         const token = await createSession(env.SESSION_SECRET);
-        return json(
-          { ok: true },
-          200,
-          {
-            "Set-Cookie": `zar_admin=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${SESSION_SECONDS}`
-          }
-        );
+        return json({ ok: true }, 200, {
+          "Set-Cookie": `zar_admin=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${SESSION_SECONDS}`
+        });
       }
 
-      if (path === "/api/admin/logout" && request.method === "POST") {
+      if (path === "/api/admin/logout" && method === "POST") {
         return json({ ok: true }, 200, {
           "Set-Cookie": "zar_admin=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0"
         });
@@ -232,55 +301,73 @@ export default {
         return json({ message: "Please log in again." }, 401);
       }
 
-      if (path === "/api/admin/me" && request.method === "GET") {
+      try {
+        await ensureTables(env);
+      } catch {
+        return json({ message: "Database setup failed." }, 503);
+      }
+
+      if (path === "/api/admin/me" && method === "GET") {
         return json({ ok: true });
       }
 
-      if (path === "/api/admin/registrations" && request.method === "GET") {
+      if (path === "/api/admin/stats" && method === "GET") {
         try {
-          const result = await env.DB.prepare(`
-            SELECT email, created_at
-            FROM registrations
-            ORDER BY created_at DESC
-            LIMIT 500
-          `).all();
-
-          const count = await env.DB.prepare(
-            "SELECT COUNT(*) AS count FROM registrations"
+          const registrations = await env.DB.prepare(
+            "SELECT COUNT(*) AS n FROM registrations"
+          ).first();
+          const codes = await env.DB.prepare(
+            "SELECT COUNT(*) AS n FROM zar_codes"
+          ).first();
+          const orders = await env.DB.prepare(
+            "SELECT COUNT(*) AS n FROM zar_orders"
+          ).first();
+          const pending = await env.DB.prepare(
+            "SELECT COUNT(*) AS n FROM zar_orders WHERE status = 'pending'"
           ).first();
 
           return json({
-            total: count?.count ?? 0,
-            registrations: result.results ?? []
+            registrations: registrations?.n ?? 0,
+            codes: codes?.n ?? 0,
+            orders: orders?.n ?? 0,
+            pending_orders: pending?.n ?? 0
           });
+        } catch {
+          return json({ message: "Could not load dashboard." }, 503);
+        }
+      }
+
+      if (path === "/api/admin/registrations" && method === "GET") {
+        try {
+          const result = await env.DB.prepare(`
+            SELECT email, created_at FROM registrations
+            ORDER BY created_at DESC LIMIT 500
+          `).all();
+          const count = await env.DB.prepare(
+            "SELECT COUNT(*) AS count FROM registrations"
+          ).first();
+          return json({ total: count?.count ?? 0, registrations: result.results ?? [] });
         } catch {
           return json({ message: "Could not load registrations." }, 503);
         }
       }
 
-      if (path === "/api/admin/settings" && request.method === "GET") {
-        try {
-          await ensureSettingsTable(env);
-          const result = await env.DB.prepare(
-            "SELECT launch_at, updated_at FROM site_settings WHERE id = 1"
-          ).first();
-          return json({
-            launch_at: result?.launch_at ?? null,
-            updated_at: result?.updated_at ?? null
-          });
-        } catch {
-          return json({ message: "Could not load settings." }, 503);
-        }
+      if (path === "/api/admin/settings" && method === "GET") {
+        const result = await env.DB.prepare(
+          "SELECT launch_at, updated_at FROM site_settings WHERE id = 1"
+        ).first();
+        return json({
+          launch_at: result?.launch_at ?? null,
+          updated_at: result?.updated_at ?? null
+        });
       }
 
-      if (path === "/api/admin/settings" && request.method === "POST") {
+      if (path === "/api/admin/settings" && method === "POST") {
         let data;
         try {
-          const body = await request.text();
-          if (body.length > 2048) return json({ message: "Request too large." }, 413);
-          data = JSON.parse(body);
-        } catch {
-          return json({ message: "Invalid request." }, 400);
+          data = await readJson(request, 2048);
+        } catch (e) {
+          return json({ message: e.message || "Invalid request." }, 400);
         }
 
         let launchAt = null;
@@ -292,18 +379,155 @@ export default {
           launchAt = new Date(data.launch_at).toISOString();
         }
 
-        try {
-          await ensureSettingsTable(env);
-          await env.DB.prepare(`
-            UPDATE site_settings
-            SET launch_at = ?, updated_at = CURRENT_TIMESTAMP
-            WHERE id = 1
-          `).bind(launchAt).run();
+        await env.DB.prepare(`
+          UPDATE site_settings
+          SET launch_at = ?, updated_at = CURRENT_TIMESTAMP
+          WHERE id = 1
+        `).bind(launchAt).run();
 
-          return json({ ok: true, launch_at: launchAt });
-        } catch {
-          return json({ message: "Could not save launch settings." }, 503);
+        return json({ ok: true, launch_at: launchAt });
+      }
+
+      // List or create access/giveaway codes
+      if (path === "/api/admin/codes" && method === "GET") {
+        const type = url.searchParams.get("type");
+        const result = type === "preorder" || type === "giveaway"
+          ? await env.DB.prepare(
+              "SELECT * FROM zar_codes WHERE type = ? ORDER BY id DESC LIMIT 500"
+            ).bind(type).all()
+          : await env.DB.prepare(
+              "SELECT * FROM zar_codes ORDER BY id DESC LIMIT 500"
+            ).all();
+        return json({ codes: result.results ?? [] });
+      }
+
+      if (path === "/api/admin/codes" && method === "POST") {
+        let data;
+        try {
+          data = await readJson(request, 2048);
+        } catch (e) {
+          return json({ message: e.message || "Invalid request." }, 400);
         }
+
+        const type = data.type;
+        const quantity = Number(data.quantity ?? 1);
+        const maxUses = Number(data.max_uses ?? 1);
+        const label = cleanText(data.label, 120);
+        const expiresAt = data.expires_at
+          ? new Date(data.expires_at)
+          : null;
+
+        if (!["preorder", "giveaway"].includes(type)) {
+          return json({ message: "Choose a valid code type." }, 400);
+        }
+        if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+          return json({ message: "Quantity must be between 1 and 100." }, 400);
+        }
+        if (!Number.isInteger(maxUses) || maxUses < 1 || maxUses > 10000) {
+          return json({ message: "Maximum uses must be between 1 and 10000." }, 400);
+        }
+        if (data.expires_at && !Number.isFinite(expiresAt.getTime())) {
+          return json({ message: "Invalid expiry date." }, 400);
+        }
+
+        const created = [];
+        for (let i = 0; i < quantity; i++) {
+          const code = makeCode();
+          await env.DB.prepare(`
+            INSERT INTO zar_codes (code, type, label, max_uses, expires_at)
+            VALUES (?, ?, ?, ?, ?)
+          `).bind(code, type, label, maxUses, expiresAt?.toISOString() ?? null).run();
+          created.push(code);
+        }
+        return json({ ok: true, codes: created });
+      }
+
+      if (path === "/api/admin/codes/update" && method === "POST") {
+        let data;
+        try {
+          data = await readJson(request, 2048);
+        } catch (e) {
+          return json({ message: e.message || "Invalid request." }, 400);
+        }
+        const id = Number(data.id);
+        const status = data.status;
+        if (!Number.isInteger(id) || !["active", "disabled"].includes(status)) {
+          return json({ message: "Invalid code update." }, 400);
+        }
+        const result = await env.DB.prepare(
+          "UPDATE zar_codes SET status = ? WHERE id = ?"
+        ).bind(status, id).run();
+        if (!result.meta || result.meta.changes !== 1) {
+          return json({ message: "Code not found." }, 404);
+        }
+        return json({ ok: true });
+      }
+
+      // Orders are currently managed manually; no payment processor is connected.
+      if (path === "/api/admin/orders" && method === "GET") {
+        const result = await env.DB.prepare(
+          "SELECT * FROM zar_orders ORDER BY id DESC LIMIT 500"
+        ).all();
+        return json({ orders: result.results ?? [] });
+      }
+
+      if (path === "/api/admin/orders" && method === "POST") {
+        let data;
+        try {
+          data = await readJson(request, 2048);
+        } catch (e) {
+          return json({ message: e.message || "Invalid request." }, 400);
+        }
+
+        const email = cleanText(data.email, 254).toLowerCase();
+        const product = cleanText(data.product, 120) || "The ZAR Early Access";
+        const notes = cleanText(data.notes, 500);
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          return json({ message: "Enter a valid customer email." }, 400);
+        }
+
+        const orderRef = makeRef();
+        await env.DB.prepare(`
+          INSERT INTO zar_orders (order_ref, email, product, notes)
+          VALUES (?, ?, ?, ?)
+        `).bind(orderRef, email, product, notes).run();
+
+        return json({ ok: true, order_ref: orderRef });
+      }
+
+      if (path === "/api/admin/orders/update" && method === "POST") {
+        let data;
+        try {
+          data = await readJson(request, 2048);
+        } catch (e) {
+          return json({ message: e.message || "Invalid request." }, 400);
+        }
+
+        const id = Number(data.id);
+        const status = data.status;
+        const allowed = ["pending", "paid", "fulfilled", "cancelled", "refunded"];
+
+        if (!Number.isInteger(id) || !allowed.includes(status)) {
+          return json({ message: "Invalid order update." }, 400);
+        }
+
+        const result = await env.DB.prepare(
+          "UPDATE zar_orders SET status = ? WHERE id = ?"
+        ).bind(status, id).run();
+
+        if (!result.meta || result.meta.changes !== 1) {
+          return json({ message: "Order not found." }, 404);
+        }
+        return json({ ok: true });
+      }
+
+      if (path === "/api/admin/game-status" && method === "GET") {
+        return json({
+          endpoint: "/api/game/redeem",
+          configured: Boolean(env.GAME_API_KEY),
+          note: "Use this endpoint only from a trusted Roblox server script."
+        });
       }
 
       return json({ message: "Not found." }, 404);

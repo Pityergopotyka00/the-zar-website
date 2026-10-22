@@ -2,318 +2,600 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex, nofollow">
-  <title>The ZAR — Admin</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #080a09;
-      --panel: #111512;
-      --border: #28332b;
-      --green: #b8ff5c;
-      --text: #f4f7f2;
-      --muted: #9ca79e;
-      --red: #ff7474;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      padding: 32px 16px;
-      background: radial-gradient(ellipse at top, #172219, var(--bg) 65%);
-      color: var(--text);
-      font-family: Inter, system-ui, Arial, sans-serif;
-    }
-    main { width: 100%; max-width: 900px; margin: auto; }
-    .brand {
-      color: var(--green);
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 4px;
-    }
-    h1 { font-size: clamp(28px, 5vw, 42px); margin: 12px 0 6px; }
-    p { color: var(--muted); line-height: 1.5; }
-    .panel {
-      margin-top: 22px;
-      padding: 24px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-    }
-    h2 { margin-top: 0; font-size: 19px; }
-    label { display: block; margin: 16px 0 8px; color: var(--muted); }
-    input {
-      width: 100%;
-      padding: 13px 14px;
-      border-radius: 9px;
-      border: 1px solid var(--border);
-      background: #080b09;
-      color: var(--text);
-      font: inherit;
-    }
-    button {
-      border: 0;
-      border-radius: 9px;
-      padding: 12px 17px;
-      margin-top: 14px;
-      background: var(--green);
-      color: #10150b;
-      font: inherit;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    button.secondary {
-      background: #222b24;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .hidden { display: none !important; }
-    .notice { min-height: 24px; font-size: 14px; }
-    .error { color: var(--red); }
-    .success { color: var(--green); }
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 14px;
-    }
-    .stat {
-      padding: 20px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: #0b0f0c;
-    }
-    .stat span { color: var(--muted); font-size: 13px; }
-    .stat strong { display: block; margin-top: 8px; font-size: 30px; }
-    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; }
-    .toolbar button { margin-top: 0; }
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; margin-top: 14px; }
-    th, td {
-      padding: 12px 10px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-    }
-    th { color: var(--muted); }
-    td { overflow-wrap: anywhere; }
-    small { color: var(--muted); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a0a0c">
+<title>THE ZAR — Command Center</title>
+<style>
+:root{color-scheme:dark;--bg:#09090b;--panel:#111114;--panel2:#17171c;--line:#29292f;--red:#ff303c;--muted:#96969f;--white:#f5f5f7}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--white);font:14px/1.5 Inter,system-ui,Segoe UI,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.hidden{display:none!important}
+.login-wrap{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 0%,#381014 0,transparent 45%)}
+.login-card{width:min(420px,100%);padding:34px;background:var(--panel);border:1px solid var(--line);border-radius:18px}
+.logo{font-size:25px;font-weight:1000;letter-spacing:4px}.logo span{color:var(--red)}
+.eyebrow{font-size:11px;letter-spacing:2px;color:var(--red);font-weight:800;text-transform:uppercase}
+.muted{color:var(--muted)}.login-card h1{margin:25px 0 5px;font-size:28px}
+label{display:block;color:#c8c8ce;font-size:12px;margin:16px 0 7px}
+input,select,textarea{width:100%;background:#0b0b0e;color:var(--white);border:1px solid #33333b;border-radius:8px;padding:11px 12px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--red)}
+.btn{border:1px solid var(--line);background:var(--panel2);color:white;border-radius:8px;padding:10px 14px;font-weight:750}
+.btn:hover{border-color:#62626b}.btn-red{background:var(--red);border-color:var(--red);color:#fff}
+.btn-red:hover{background:#e5212d}.btn-wide{width:100%;margin-top:18px}
+.error{color:#ff737a;font-size:12px;margin-top:12px;min-height:18px}
+.app{min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:245px;background:#0d0d10;border-right:1px solid var(--line);padding:25px 15px;display:flex;flex-direction:column;z-index:5}
+.brand{padding:0 12px 27px;border-bottom:1px solid var(--line)}
+.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:2px;margin-top:6px}
+.nav-label{padding:22px 12px 9px;color:#666670;font-size:10px;letter-spacing:1.8px;font-weight:800}
+.nav{display:flex;flex-direction:column;gap:5px}
+.nav button{display:flex;align-items:center;gap:12px;text-align:left;padding:11px 12px;border:1px solid transparent;border-radius:8px;background:transparent;color:#aaaab3;font-weight:650}
+.nav button:hover,.nav button.active{background:#241114;border-color:#492025;color:white}
+.nav button.active .ico{color:var(--red)}.ico{width:20px;text-align:center;font-size:16px}
+.sidebar-bottom{margin-top:auto;border-top:1px solid var(--line);padding:18px 8px 0}
+.admin-tag{font-size:11px;color:var(--muted);margin-bottom:12px}
+.main{margin-left:245px;padding:32px;max-width:1600px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:30px}
+.topbar h1{font-size:26px;margin:3px 0 0;letter-spacing:-.7px}
+.top-actions{display:flex;gap:8px;align-items:center}
+.status-dot{display:inline-block;width:7px;height:7px;background:#55d68b;border-radius:50%;margin-right:7px}
+.view{display:none}.view.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:24px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;min-width:0}
+.stat-top{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+.stat-icon{color:var(--red);font-size:17px}.stat-number{font-size:32px;font-weight:850;margin:12px 0 2px;letter-spacing:-1px}
+.stat-foot{font-size:11px;color:var(--muted)}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}
+.section-head h2{font-size:17px;margin:0}.section-head p{margin:4px 0 0;color:var(--muted);font-size:12px}
+.two-col{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:16px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}
+.form-grid .full{grid-column:1/-1}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:600px;font-size:12px}
+th{text-align:left;color:#92929c;font-weight:700;background:#151519}
+th,td{padding:13px 15px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}td{color:#e2e2e7}
+code{font-size:11px;color:#ff838a;overflow-wrap:anywhere}
+.pill{display:inline-block;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;background:#29292e;color:#c6c6cc}
+.pill.active,.pill.paid,.pill.fulfilled{background:#123222;color:#7ce5a4}
+.pill.pending{background:#382d15;color:#ffd579}
+.pill.disabled,.pill.cancelled,.pill.refunded{background:#35171a;color:#ff858b}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.notice{padding:12px 14px;background:#191519;border:1px solid #442126;border-radius:8px;color:#d4b9bc;font-size:12px;margin-top:14px}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#08080a;border:1px solid var(--line);padding:14px;border-radius:8px;color:#e7a0a4;font-size:12px}
+.toast{position:fixed;right:24px;bottom:24px;background:#18181d;border:1px solid #45454d;padding:13px 17px;border-radius:9px;z-index:20;max-width:360px;box-shadow:0 12px 40px #0009}
+.small{font-size:11px}.red{color:var(--red)}
+@media(max-width:1000px){.sidebar{width:205px}.main{margin-left:205px;padding:24px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.two-col{grid-template-columns:1fr}}
+@media(max-width:680px){.sidebar{position:static;width:auto;height:auto;padding:14px;border-right:0;border-bottom:1px solid var(--line)}.brand{padding:0 8px 13px}.nav-label,.sidebar-bottom{display:none}.nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:12px}.nav button{justify-content:center;flex-direction:column;gap:3px;padding:8px 3px;font-size:10px}.ico{font-size:15px}.main{margin:0;padding:18px 13px}.topbar{align-items:flex-start}.topbar h1{font-size:22px}.top-actions .muted{display:none}.grid{gap:9px}.card{padding:14px}.stat-number{font-size:26px}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.section-head{align-items:flex-start;flex-wrap:wrap}}
+</style>
 </head>
 <body>
-<main>
-  <div class="brand">THE ZAR / CONTROL CENTER</div>
-  <h1>Admin dashboard</h1>
-  <p>Manage your launch and view pre-registrations.</p>
 
-  <section id="login" class="panel">
-    <h2>Admin login</h2>
-    <form id="loginForm">
-      <label for="password">Admin password</label>
-      <input id="password" type="password" autocomplete="current-password"
-        required maxlength="1024">
-      <button type="submit">Log in</button>
-    </form>
-    <p id="loginMessage" class="notice" role="status"></p>
-  </section>
+<div id="loginScreen" class="login-wrap">
+  <form id="loginForm" class="login-card">
+    <div class="logo">THE <span>ZAR</span></div>
+    <div class="eyebrow" style="margin-top:9px">Secure access // 01</div>
+    <h1>Command Center</h1>
+    <p class="muted">Authorized administrators only.</p>
+    <label for="password">ADMIN PASSWORD</label>
+    <input id="password" type="password" autocomplete="current-password" required placeholder="Enter your password">
+    <button class="btn btn-red btn-wide" type="submit">ACCESS PANEL ↗</button>
+    <div id="loginError" class="error"></div>
+  </form>
+</div>
 
-  <section id="dashboard" class="hidden">
-    <div class="toolbar">
-      <button id="refresh" type="button">Refresh data</button>
-      <button id="logout" class="secondary" type="button">Log out</button>
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">THE <span>ZAR</span></div>
+      <small>ADMIN COMMAND CENTER</small>
     </div>
+    <div class="nav-label">MANAGEMENT</div>
+    <nav class="nav">
+      <button class="active" data-view="dashboard"><span class="ico">◈</span>Dashboard</button>
+      <button data-view="codes"><span class="ico">⌘</span>Codes</button>
+      <button data-view="orders"><span class="ico">▤</span>Orders</button>
+      <button data-view="giveaways"><span class="ico">✳</span>Giveaway Codes</button>
+      <button data-view="game"><span class="ico">⌁</span>Game Integration</button>
+      <button data-view="launch"><span class="ico">◷</span>Launch Date</button>
+      <button data-view="registrations"><span class="ico">◎</span>Registrations</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="admin-tag"><span class="status-dot"></span>Admin session active</div>
+      <button class="btn" id="logoutBtn" style="width:100%">↪ Log out</button>
+    </div>
+  </aside>
 
-    <section class="panel">
-      <h2>Overview</h2>
-      <div class="stats">
-        <div class="stat">
-          <span>Total pre-registrations</span>
-          <strong id="total">—</strong>
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">THE ZAR / OPERATIONS</div>
+        <h1 id="pageTitle">Dashboard</h1>
+      </div>
+      <div class="top-actions">
+        <span class="muted small"><span class="status-dot"></span>SECURE SESSION</span>
+        <button class="btn" id="refreshBtn">↻ Refresh</button>
+      </div>
+    </header>
+
+    <section id="view-dashboard" class="view active">
+      <div class="grid">
+        <div class="card"><div class="stat-top">PRE-REGISTRATIONS <span class="stat-icon">◎</span></div><div class="stat-number" id="statRegs">—</div><div class="stat-foot">Collected signup emails</div></div>
+        <div class="card"><div class="stat-top">GENERATED CODES <span class="stat-icon">⌘</span></div><div class="stat-number" id="statCodes">—</div><div class="stat-foot">Pre-order + giveaway codes</div></div>
+        <div class="card"><div class="stat-top">ORDERS <span class="stat-icon">▤</span></div><div class="stat-number" id="statOrders">—</div><div class="stat-foot">Manually tracked orders</div></div>
+        <div class="card"><div class="stat-top">PENDING ORDERS <span class="stat-icon">◷</span></div><div class="stat-number" id="statPending">—</div><div class="stat-foot">Awaiting review</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="section-head"><div><h2>Launch status</h2><p>Public countdown configuration</p></div><button class="btn" data-go="launch">Manage ↗</button></div>
+          <div class="eyebrow">CURRENT LAUNCH DATE</div>
+          <h2 id="dashboardLaunch" style="font-size:23px;margin:10px 0">Loading…</h2>
+          <p class="muted small">No date set means the public site can continue showing “Launching soon”.</p>
         </div>
-        <div class="stat">
-          <span>Current launch date</span>
-          <strong id="launchSummary" style="font-size:17px">Not set</strong>
+        <div class="card">
+          <div class="section-head"><div><h2>Game connection</h2><p>Code validation endpoint</p></div><button class="btn" data-go="game">View ↗</button></div>
+          <h2 id="dashboardGame" style="font-size:21px;margin:15px 0">Checking…</h2>
+          <p class="muted small">Game requests must come from a trusted server, not a client LocalScript.</p>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="section-head"><div><h2>Quick actions</h2><p>Common admin operations</p></div></div>
+        <div class="actions">
+          <button class="btn btn-red" data-go="codes">+ Create access codes</button>
+          <button class="btn" data-go="giveaways">+ Create giveaway codes</button>
+          <button class="btn" data-go="orders">Manage orders</button>
+          <button class="btn" data-go="launch">Set launch date</button>
         </div>
       </div>
     </section>
 
-    <section class="panel">
-      <h2>Launch settings</h2>
-      <p>Choose the launch date and time. Leave it empty to clear the date.</p>
-      <form id="settingsForm">
-        <label for="launchAt">Launch date and time (your local time)</label>
-        <input id="launchAt" type="datetime-local">
-        <button type="submit">Save launch date</button>
-      </form>
-      <p id="settingsMessage" class="notice" role="status"></p>
+    <section id="view-codes" class="view">
+      <div class="two-col">
+        <div class="card">
+          <div class="section-head"><div><h2>Create codes</h2><p>Generate pre-order / early-access codes</p></div></div>
+          <form id="codeForm">
+            <label>CODE LABEL / REWARD</label><input name="label" maxlength="120" placeholder="Early Access">
+            <div class="form-grid">
+              <div><label>QUANTITY (1–100)</label><input name="quantity" type="number" min="1" max="100" value="1" required></div>
+              <div><label>MAX USES PER CODE</label><input name="max_uses" type="number" min="1" max="10000" value="1" required></div>
+              <div class="full"><label>OPTIONAL EXPIRY</label><input name="expires_at" type="datetime-local"></div>
+            </div>
+            <button class="btn btn-red" type="submit">Generate access codes</button>
+          </form>
+          <div id="createdCodes" class="notice hidden"></div>
+        </div>
+        <div class="card">
+          <h2 style="margin-top:0">Code rules</h2>
+          <p class="muted">Codes are stored in your D1 database. Each code can have a usage limit and optional expiry.</p>
+          <p class="muted">Disabling a code prevents future redemptions through the game API.</p>
+          <div class="notice">Important: generating a code does not confirm payment. Payment processing is not connected yet.</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="section-head"><div><h2>Access codes</h2><p>Manage existing pre-order codes</p></div><button class="btn" id="reloadCodes">↻ Reload</button></div>
+        <div id="codesTable" class="table-wrap"></div>
+      </div>
     </section>
 
-    <section class="panel">
-      <h2>Pre-registrations</h2>
-      <p>Showing up to the latest 500 addresses.</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Email</th><th>Registered at</th></tr>
-          </thead>
-          <tbody id="registrationRows">
-            <tr><td colspan="2">Loading…</td></tr>
-          </tbody>
-        </table>
+    <section id="view-giveaways" class="view">
+      <div class="two-col">
+        <div class="card">
+          <div class="section-head"><div><h2>Giveaway generator</h2><p>Create free promotional codes</p></div></div>
+          <form id="giveawayForm">
+            <label>REWARD / LABEL</label><input name="label" maxlength="120" placeholder="Free Early Access">
+            <div class="form-grid">
+              <div><label>QUANTITY</label><input name="quantity" type="number" min="1" max="100" value="10" required></div>
+              <div><label>MAX USES PER CODE</label><input name="max_uses" type="number" min="1" max="10000" value="1" required></div>
+              <div class="full"><label>OPTIONAL EXPIRY</label><input name="expires_at" type="datetime-local"></div>
+            </div>
+            <button class="btn btn-red" type="submit">Generate giveaway codes</button>
+          </form>
+          <div id="createdGiveaways" class="notice hidden"></div>
+        </div>
+        <div class="card">
+          <h2 style="margin-top:0">Giveaway management</h2>
+          <p class="muted">Giveaway codes are free promotional codes. You can create individual codes or batches, set usage limits and disable codes.</p>
+          <div class="notice">This creates and validates codes; it does not automatically grant a Roblox item. Your Roblox server must award the configured reward after successful validation.</div>
+        </div>
       </div>
-      <p id="registrationMessage" class="notice" role="status"></p>
+      <div class="card" style="margin-top:16px">
+        <div class="section-head"><div><h2>Giveaway codes</h2><p>Issued promotional codes</p></div><button class="btn" id="reloadGiveaways">↻ Reload</button></div>
+        <div id="giveawaysTable" class="table-wrap"></div>
+      </div>
     </section>
-  </section>
-</main>
+
+    <section id="view-orders" class="view">
+      <div class="two-col">
+        <div class="card">
+          <div class="section-head"><div><h2>Add an order</h2><p>Manually record an order or pre-order</p></div></div>
+          <form id="orderForm">
+            <label>CUSTOMER EMAIL</label><input name="email" type="email" required maxlength="254" placeholder="customer@example.com">
+            <label>PRODUCT</label><input name="product" maxlength="120" value="The ZAR Early Access">
+            <label>NOTES</label><textarea name="notes" maxlength="500" rows="3" placeholder="Optional notes"></textarea>
+            <button class="btn btn-red" type="submit">Create pending order</button>
+          </form>
+        </div>
+        <div class="card">
+          <h2 style="margin-top:0">Order status</h2>
+          <p class="muted">Orders can be marked pending, paid, fulfilled, cancelled or refunded.</p>
+          <div class="notice">Manual status changes are not payment verification. Do not mark an order paid until you've independently confirmed payment.</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="section-head"><div><h2>Orders</h2><p>All recorded orders</p></div><button class="btn" id="reloadOrders">↻ Reload</button></div>
+        <div id="ordersTable" class="table-wrap"></div>
+      </div>
+    </section>
+
+    <section id="view-game" class="view">
+      <div class="two-col">
+        <div class="card">
+          <div class="section-head"><div><h2>Game integration</h2><p>Server-side code validation</p></div></div>
+          <div class="eyebrow">REDEMPTION ENDPOINT</div>
+          <pre>POST /api/game/redeem
+Authorization: Bearer YOUR_GAME_API_KEY
+Content-Type: application/json
+
+{
+  "code": "ZAR-ABCDE-FGHIJ"
+}</pre>
+          <div class="notice">Keep the API key inside a Roblox server Script or secure server configuration. Never expose it in a LocalScript, GUI, or replicated storage.</div>
+          <div class="actions"><button class="btn" id="refreshGame">Check integration</button><span id="gameStatus" class="muted small"></span></div>
+        </div>
+        <div class="card">
+          <h2 style="margin-top:0">Response example</h2>
+          <pre>{
+  "ok": true,
+  "type": "giveaway",
+  "reward": "Free Early Access"
+}</pre>
+          <p class="muted">The endpoint validates and consumes a code use. Your Roblox server must then decide what reward to grant and prevent the same player from claiming the reward twice.</p>
+          <div class="notice">The API key must be configured as a Cloudflare Worker secret named <code>GAME_API_KEY</code>. This admin panel never displays the secret.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-launch" class="view">
+      <div class="two-col">
+        <div class="card">
+          <div class="section-head"><div><h2>Launch scheduling</h2><p>Control the public website countdown</p></div></div>
+          <form id="launchForm">
+            <label>LAUNCH DATE AND TIME</label>
+            <input id="launchAt" type="datetime-local">
+            <p class="muted small">Leave blank to remove the countdown and keep the launch date undecided.</p>
+            <div class="actions">
+              <button class="btn btn-red" type="submit">Save launch date</button>
+              <button class="btn" type="button" id="clearLaunch">Clear date</button>
+            </div>
+          </form>
+          <div id="launchMessage" class="muted small" style="margin-top:14px"></div>
+        </div>
+        <div class="card">
+          <div class="eyebrow">PUBLIC STATUS</div>
+          <h2 id="launchPreview" style="font-size:24px;margin:12px 0">Loading…</h2>
+          <p class="muted">This setting is read by your public website through <code>/api/launch</code>.</p>
+          <div class="notice">Save a date only when the launch schedule is confirmed. You can change or clear it here later.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-registrations" class="view">
+      <div class="card">
+        <div class="section-head"><div><h2>Pre-registrations</h2><p>People who signed up on the public website</p></div><button class="btn" id="reloadRegs">↻ Reload</button></div>
+        <p class="muted small" id="registrationCount"></p>
+        <div id="registrationsTable" class="table-wrap"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="toast" class="toast hidden" role="status"></div>
 
 <script>
-  const $ = id => document.getElementById(id);
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
 
-  async function api(path, options = {}) {
-    const response = await fetch(path, {
-      credentials: "same-origin",
-      ...options,
-      headers: {
-        ...(options.body ? { "Content-Type": "application/json" } : {}),
-        ...options.headers
-      }
+async function api(path, options = {}) {
+  const response = await fetch(path, {
+    credentials: "same-origin",
+    ...options,
+    headers: {
+      ...(options.body ? {"Content-Type": "application/json"} : {}),
+      ...(options.headers || {})
+    }
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    if (response.status === 401) showLogin();
+    throw new Error(data.message || "Request failed.");
+  }
+  return data;
+}
+
+function toast(message) {
+  const el = $("#toast");
+  el.textContent = message;
+  el.classList.remove("hidden");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => el.classList.add("hidden"), 3500);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
+}
+
+function showLogin() {
+  $("#app").classList.add("hidden");
+  $("#loginScreen").classList.remove("hidden");
+}
+
+function showApp() {
+  $("#loginScreen").classList.add("hidden");
+  $("#app").classList.remove("hidden");
+}
+
+function showView(name) {
+  $$(".view").forEach(el => el.classList.toggle("active", el.id === "view-" + name));
+  $$(".nav button").forEach(el => el.classList.toggle("active", el.dataset.view === name));
+  const titles = {
+    dashboard:"Dashboard", codes:"Codes", orders:"Orders",
+    giveaways:"Giveaway Codes", game:"Game Integration",
+    launch:"Launch Date", registrations:"Registrations"
+  };
+  $("#pageTitle").textContent = titles[name] || "Dashboard";
+  loadView(name).catch(e => toast(e.message));
+}
+
+$$(".nav button").forEach(btn => btn.addEventListener("click", () => showView(btn.dataset.view)));
+$$("[data-go]").forEach(btn => btn.addEventListener("click", () => showView(btn.dataset.go)));
+
+$("#loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  $("#loginError").textContent = "";
+  try {
+    await api("/api/admin/login", {
+      method:"POST",
+      body:JSON.stringify({password:$("#password").value})
     });
-
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      const error = new Error(data.message || "Request failed.");
-      error.status = response.status;
-      throw error;
-    }
-    return data;
+    $("#password").value = "";
+    showApp();
+    showView("dashboard");
+    toast("Welcome to the command center.");
+  } catch (err) {
+    $("#loginError").textContent = err.message;
   }
+});
 
-  function showDashboard(show) {
-    $("login").classList.toggle("hidden", show);
-    $("dashboard").classList.toggle("hidden", !show);
+$("#logoutBtn").addEventListener("click", async () => {
+  try { await api("/api/admin/logout", {method:"POST", body:"{}"}); }
+  finally { showLogin(); toast("Logged out."); }
+});
+
+$("#refreshBtn").addEventListener("click", () => loadView(
+  $$(".view").find(el => el.classList.contains("active"))?.id.replace("view-","") || "dashboard"
+).then(() => toast("Data refreshed.")).catch(e => toast(e.message)));
+
+async function loadView(name) {
+  if (name === "dashboard") await loadDashboard();
+  if (name === "codes") await loadCodes("preorder");
+  if (name === "giveaways") await loadCodes("giveaway");
+  if (name === "orders") await loadOrders();
+  if (name === "launch") await loadLaunch();
+  if (name === "registrations") await loadRegistrations();
+  if (name === "game") await loadGame();
+}
+
+async function loadDashboard() {
+  const [stats, settings, game] = await Promise.all([
+    api("/api/admin/stats"), api("/api/admin/settings"), api("/api/admin/game-status")
+  ]);
+  $("#statRegs").textContent = stats.registrations;
+  $("#statCodes").textContent = stats.codes;
+  $("#statOrders").textContent = stats.orders;
+  $("#statPending").textContent = stats.pending_orders;
+  const date = settings.launch_at ? new Date(settings.launch_at) : null;
+  $("#dashboardLaunch").textContent = date && !Number.isNaN(date.getTime())
+    ? date.toLocaleString() : "LAUNCHING SOON";
+  $("#dashboardGame").textContent = game.configured ? "API key configured" : "Setup required";
+}
+
+function dateText(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? escapeHtml(value) : escapeHtml(date.toLocaleString());
+}
+
+async function loadCodes(type) {
+  const data = await api("/api/admin/codes?type=" + encodeURIComponent(type));
+  const target = type === "giveaway" ? "#giveawaysTable" : "#codesTable";
+  const list = data.codes || [];
+  if (!list.length) {
+    $(target).innerHTML = '<div class="empty">No codes yet. Generate your first batch above.</div>';
+    return;
   }
+  $(target).innerHTML = `<table><thead><tr>
+    <th>CODE</th><th>LABEL / REWARD</th><th>USES</th><th>EXPIRES</th><th>STATUS</th><th>ACTION</th>
+    </tr></thead><tbody>${list.map(c => `<tr>
+    <td><code>${escapeHtml(c.code)}</code><br><button class="btn copy-code" data-code="${escapeHtml(c.code)}" style="padding:4px 7px;margin-top:5px">Copy</button></td>
+    <td>${escapeHtml(c.label || (c.type === "giveaway" ? "Giveaway" : "Early access"))}</td>
+    <td>${Number(c.uses)}/${Number(c.max_uses)}</td>
+    <td>${dateText(c.expires_at)}</td>
+    <td><span class="pill ${escapeHtml(c.status)}">${escapeHtml(c.status)}</span></td>
+    <td>${c.status === "active" ? `<button class="btn disable-code" data-id="${Number(c.id)}">Disable</button>` : "—"}</td>
+    </tr>`).join("")}</tbody></table>`;
 
-  function setMessage(id, message, isError = false) {
-    const el = $(id);
-    el.textContent = message;
-    el.className = "notice " + (isError ? "error" : "success");
-  }
+  $$(target + " .copy-code").forEach(btn => btn.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(btn.dataset.code); toast("Code copied."); }
+    catch { toast("Copy not available in this browser."); }
+  }));
 
-  function localInputValue(iso) {
-    if (!iso) return "";
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) return "";
-    const offset = date.getTimezoneOffset() * 60000;
-    return new Date(date.getTime() - offset).toISOString().slice(0, 16);
-  }
-
-  function displayDate(iso) {
-    if (!iso) return "Not set";
-    const date = new Date(iso);
-    return Number.isNaN(date.getTime())
-      ? "Not set"
-      : date.toLocaleString();
-  }
-
-  async function loadData() {
+  $$(target + " .disable-code").forEach(btn => btn.addEventListener("click", async () => {
+    if (!confirm("Disable this code? It will no longer be redeemable.")) return;
     try {
-      const [settings, registrations] = await Promise.all([
-        api("/api/admin/settings"),
-        api("/api/admin/registrations")
-      ]);
-
-      $("launchAt").value = localInputValue(settings.launch_at);
-      $("launchSummary").textContent = displayDate(settings.launch_at);
-      $("total").textContent = registrations.total;
-
-      const tbody = $("registrationRows");
-      tbody.replaceChildren();
-
-      if (!registrations.registrations.length) {
-        const row = document.createElement("tr");
-        const cell = document.createElement("td");
-        cell.colSpan = 2;
-        cell.textContent = "No registrations yet.";
-        row.appendChild(cell);
-        tbody.appendChild(row);
-      } else {
-        for (const item of registrations.registrations) {
-          const row = document.createElement("tr");
-          const email = document.createElement("td");
-          const date = document.createElement("td");
-          email.textContent = item.email;
-          date.textContent = displayDate(item.created_at);
-          row.append(email, date);
-          tbody.appendChild(row);
-        }
-      }
-      setMessage("registrationMessage", "Data loaded.");
-    } catch (error) {
-      if (error.status === 401) {
-        showDashboard(false);
-        setMessage("loginMessage", "Your session expired. Log in again.", true);
-      } else {
-        setMessage("registrationMessage", error.message, true);
-      }
-    }
-  }
-
-  async function checkLogin() {
-    try {
-      await api("/api/admin/me");
-      showDashboard(true);
-      await loadData();
-    } catch {
-      showDashboard(false);
-    }
-  }
-
-  $("loginForm").addEventListener("submit", async event => {
-    event.preventDefault();
-    setMessage("loginMessage", "Logging in…");
-    try {
-      await api("/api/admin/login", {
-        method: "POST",
-        body: JSON.stringify({ password: $("password").value })
+      await api("/api/admin/codes/update", {
+        method:"POST", body:JSON.stringify({id:Number(btn.dataset.id),status:"disabled"})
       });
-      $("password").value = "";
-      showDashboard(true);
-      await loadData();
-    } catch (error) {
-      setMessage("loginMessage", error.message, true);
-    }
-  });
+      toast("Code disabled.");
+      await loadCodes(type);
+    } catch (e) { toast(e.message); }
+  }));
+}
 
-  $("settingsForm").addEventListener("submit", async event => {
-    event.preventDefault();
-    const value = $("launchAt").value;
-    const launch_at = value ? new Date(value).toISOString() : null;
-
+function setupCodeForm(formId, type, resultId) {
+  $(formId).addEventListener("submit", async e => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const expiry = form.get("expires_at");
+    const payload = {
+      type,
+      label:form.get("label"),
+      quantity:Number(form.get("quantity")),
+      max_uses:Number(form.get("max_uses")),
+      expires_at:expiry ? new Date(expiry).toISOString() : null
+    };
     try {
-      const result = await api("/api/admin/settings", {
-        method: "POST",
-        body: JSON.stringify({ launch_at })
+      const result = await api("/api/admin/codes", {
+        method:"POST", body:JSON.stringify(payload)
       });
-      $("launchSummary").textContent = displayDate(result.launch_at);
-      setMessage("settingsMessage", "Launch date saved!");
-    } catch (error) {
-      setMessage("settingsMessage", error.message, true);
-    }
+      const box = $(resultId);
+      box.innerHTML = "<strong>Codes created — save them now:</strong><br><br>" +
+        result.codes.map(c => "<code>" + escapeHtml(c) + "</code>").join("<br>");
+      box.classList.remove("hidden");
+      toast(result.codes.length + " code(s) generated.");
+      e.currentTarget.reset();
+      await loadCodes(type);
+      if (type === "preorder") $("#view-codes").querySelector('[name="max_uses"]').value = "1";
+      else $("#view-giveaways").querySelector('[name="max_uses"]').value = "1";
+    } catch (err) { toast(err.message); }
   });
+}
 
-  $("refresh").addEventListener("click", loadData);
+setupCodeForm("#codeForm", "preorder", "#createdCodes");
+setupCodeForm("#giveawayForm", "giveaway", "#createdGiveaways");
+$("#reloadCodes").addEventListener("click", () => loadCodes("preorder").catch(e => toast(e.message)));
+$("#reloadGiveaways").addEventListener("click", () => loadCodes("giveaway").catch(e => toast(e.message)));
 
-  $("logout").addEventListener("click", async () => {
+async function loadOrders() {
+  const data = await api("/api/admin/orders");
+  const list = data.orders || [];
+  if (!list.length) {
+    $("#ordersTable").innerHTML = '<div class="empty">No orders recorded yet.</div>';
+    return;
+  }
+  const statuses = ["pending","paid","fulfilled","cancelled","refunded"];
+  $("#ordersTable").innerHTML = `<table><thead><tr>
+    <th>REFERENCE</th><th>CUSTOMER</th><th>PRODUCT</th><th>CREATED</th><th>STATUS</th><th>SAVE</th>
+    </tr></thead><tbody>${list.map(o => `<tr>
+    <td><code>${escapeHtml(o.order_ref)}</code></td>
+    <td>${escapeHtml(o.email)}</td><td>${escapeHtml(o.product)}</td>
+    <td>${dateText(o.created_at)}</td>
+    <td><select class="order-status" data-id="${Number(o.id)}">${statuses.map(s => `<option value="${s}" ${o.status===s?"selected":""}>${s}</option>`).join("")}</select></td>
+    <td><button class="btn save-order" data-id="${Number(o.id)}">Save</button></td>
+    </tr>`).join("")}</tbody></table>`;
+
+  $$("#ordersTable .save-order").forEach(btn => btn.addEventListener("click", async () => {
+    const select = $(`#ordersTable .order-status[data-id="${btn.dataset.id}"]`);
     try {
-      await api("/api/admin/logout", { method: "POST", body: "{}" });
-    } finally {
-      showDashboard(false);
-      setMessage("loginMessage", "You are logged out.");
-    }
-  });
+      await api("/api/admin/orders/update", {
+        method:"POST",
+        body:JSON.stringify({id:Number(btn.dataset.id),status:select.value})
+      });
+      toast("Order status updated.");
+      await loadDashboard();
+    } catch (e) { toast(e.message); }
+  }));
+}
 
-  checkLogin();
+$("#orderForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const f = new FormData(e.currentTarget);
+  try {
+    const result = await api("/api/admin/orders", {
+      method:"POST",
+      body:JSON.stringify({
+        email:f.get("email"), product:f.get("product"), notes:f.get("notes")
+      })
+    });
+    toast("Order created: " + result.order_ref);
+    e.currentTarget.reset();
+    await loadOrders();
+    await loadDashboard();
+  } catch (err) { toast(err.message); }
+});
+$("#reloadOrders").addEventListener("click", () => loadOrders().catch(e => toast(e.message)));
+
+function toLocalInput(value) {
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0,16);
+}
+
+async function loadLaunch() {
+  const data = await api("/api/admin/settings");
+  $("#launchAt").value = data.launch_at ? toLocalInput(data.launch_at) : "";
+  const text = data.launch_at ? new Date(data.launch_at).toLocaleString() : "LAUNCHING SOON";
+  $("#launchPreview").textContent = text;
+  $("#launchMessage").textContent = data.updated_at ? "Last updated: " + data.updated_at : "";
+}
+
+async function saveLaunch(value) {
+  const launchAt = value ? new Date(value).toISOString() : null;
+  await api("/api/admin/settings", {
+    method:"POST", body:JSON.stringify({launch_at:launchAt})
+  });
+  toast(launchAt ? "Launch date saved." : "Launch date cleared.");
+  await loadLaunch();
+  await loadDashboard();
+}
+
+$("#launchForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  try { await saveLaunch($("#launchAt").value); }
+  catch (err) { toast(err.message); }
+});
+$("#clearLaunch").addEventListener("click", async () => {
+  $("#launchAt").value = "";
+  try { await saveLaunch(""); }
+  catch (err) { toast(err.message); }
+});
+
+async function loadRegistrations() {
+  const data = await api("/api/admin/registrations");
+  const list = data.registrations || [];
+  $("#registrationCount").textContent = "Total registrations: " + data.total;
+  if (!list.length) {
+    $("#registrationsTable").innerHTML = '<div class="empty">No registrations yet.</div>';
+    return;
+  }
+  $("#registrationsTable").innerHTML = `<table><thead><tr><th>EMAIL</th><th>REGISTERED</th></tr></thead><tbody>
+    ${list.map(r => `<tr><td>${escapeHtml(r.email)}</td><td>${dateText(r.created_at)}</td></tr>`).join("")}
+    </tbody></table>`;
+}
+$("#reloadRegs").addEventListener("click", () => loadRegistrations().catch(e => toast(e.message)));
+
+async function loadGame() {
+  const data = await api("/api/admin/game-status");
+  $("#gameStatus").textContent = data.configured ? "API secret configured." : "GAME_API_KEY secret is missing.";
+  $("#gameStatus").style.color = data.configured ? "#7ce5a4" : "#ff858b";
+  $("#dashboardGame").textContent = data.configured ? "API key configured" : "Setup required";
+}
+$("#refreshGame").addEventListener("click", () => loadGame().catch(e => toast(e.message)));
+
+(async function init() {
+  try {
+    await api("/api/admin/me");
+    showApp();
+    showView("dashboard");
+  } catch {
+    showLogin();
+  }
+})();
 </script>
 </body>
 </html>

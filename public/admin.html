@@ -452,6 +452,18 @@ end
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+
+-- Save the game's current mouse state, then unlock it so the player can type.
+local previousMouseBehavior = UserInputService.MouseBehavior
+local previousMouseIconEnabled = UserInputService.MouseIconEnabled
+UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+UserInputService.MouseIconEnabled = true
+
+local function restoreMouse()
+    UserInputService.MouseBehavior = previousMouseBehavior
+    UserInputService.MouseIconEnabled = previousMouseIconEnabled
+end
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -571,6 +583,7 @@ redeem.Activated:Connect(function()
         status.TextColor3 = Color3.fromRGB(110, 235, 185)
         task.wait(0.5)
         gui:Destroy()
+        restoreMouse() -- Return the mouse to the game's normal state after successful access.
         return
     end
 
@@ -927,7 +940,30 @@ $("#reloadRegs").addEventListener("click", () => loadRegistrations().catch(e => 
 
 const zarLuaSourceText = $("#zarLuaSource").value;
 $("#zarLuaSource").value = zarLuaSourceText;
-$("#zarCopyLua").addEventListener("click", async () => { try { await navigator.clipboard.writeText(zarLuaSourceText); toast("Lua copied. Paste into ServerScriptService > Script."); } catch { $("#zarLuaSource").focus(); $("#zarLuaSource").select(); toast("Select the code and copy it manually."); } });
+async function copySetupCode(text, textarea, successMessage) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      toast(successMessage);
+      return;
+    }
+  } catch {}
+  // Fallback for browsers where Clipboard API access is blocked.
+  textarea.focus();
+  textarea.select();
+  textarea.setSelectionRange(0, textarea.value.length);
+  let copied = false;
+  try { copied = document.execCommand("copy"); } catch {}
+  if (copied) toast(successMessage);
+  else toast("Code selected. Press Ctrl+C (or long-press and Copy on mobile).");
+}
+$("#zarCopyLua").addEventListener("click", () =>
+  copySetupCode(zarLuaSourceText, $("#zarLuaSource"), "Code A copied — paste into ServerScriptService > Script.")
+);
+const zarClientLuaSourceText = $("#zarClientLuaSource").value;
+$("#zarCopyClientLua").addEventListener("click", () =>
+  copySetupCode(zarClientLuaSourceText, $("#zarClientLuaSource"), "Code B copied — paste into StarterPlayer > StarterPlayerScripts > LocalScript.")
+);
 const gameChecklistIds = ["gameStepSecret","gameStepHttp","gameStepScript","gameStepTest"];
 function updateGameChecklist() {
   const done = gameChecklistIds.filter(id => $("#"+id)?.checked).length;

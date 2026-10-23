@@ -440,6 +440,153 @@ end
             </label>
             <div class="actions"><button class="btn btn-red" type="submit">Save Roblox Setup</button><span id="robloxSaveStatus" class="muted small"></span></div>
           </form>
+          <div class="card" style="margin-top:16px">
+            <div class="section-head"><div><h2>Roblox Setup — Code Input Screen</h2><p>Code B · LocalScript · the black screen players see</p></div><span class="pill active">COPY-PASTE LUA</span></div>
+            <p>This is the <strong>player interface</strong>, not the security validator. It creates a full-screen black panel with a code box and Redeem button, then asks the server script named below to validate the code.</p>
+            <p><strong>Where to put it:</strong> Roblox Studio → StarterPlayer → StarterPlayerScripts → click <strong>+</strong> → LocalScript. Name it <code>ZAR_AccessScreen</code>, replace its contents with this code, and keep the server validator in <code>ServerScriptService</code>.</p>
+            <button class="btn btn-red" type="button" id="zarCopyClientLua">Copy Code B — Access Screen</button>
+            <textarea id="zarClientLuaSource" rows="26" readonly spellcheck="false" style="width:100%;font:12px/1.5 monospace;white-space:pre;overflow:auto;margin-top:12px">-- THE ZAR — Code B: player-facing access screen
+-- Place this LocalScript in StarterPlayer > StarterPlayerScripts.
+-- It requires Code A (the server validator) to create ReplicatedStorage.ZAR_RedeemCode.
+-- This screen is UI only: never put the API key in this LocalScript.
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local remote = ReplicatedStorage:WaitForChild("ZAR_RedeemCode", 30)
+
+if not remote or not remote:IsA("RemoteFunction") then
+    warn("THE ZAR: server validator missing. Check Code A in ServerScriptService.")
+    return
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "ZARAccessScreen"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.DisplayOrder = 100000
+gui.Parent = playerGui
+
+local background = Instance.new("Frame")
+background.Name = "Blackout"
+background.Size = UDim2.fromScale(1, 1)
+background.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+background.BorderSizePixel = 0
+background.Parent = gui
+
+local panel = Instance.new("Frame")
+panel.AnchorPoint = Vector2.new(0.5, 0.5)
+panel.Position = UDim2.fromScale(0.5, 0.5)
+panel.Size = UDim2.new(0.88, 0, 0, 270)
+panel.BackgroundColor3 = Color3.fromRGB(12, 15, 24)
+panel.BorderSizePixel = 0
+panel.Parent = background
+Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 14)
+
+local limit = Instance.new("UISizeConstraint")
+limit.MaxSize = Vector2.new(440, 270)
+limit.MinSize = Vector2.new(280, 270)
+limit.Parent = panel
+
+local title = Instance.new("TextLabel")
+title.BackgroundTransparency = 1
+title.Position = UDim2.new(0, 22, 0, 20)
+title.Size = UDim2.new(1, -44, 0, 42)
+title.Font = Enum.Font.GothamBlack
+title.Text = "THE ZAR"
+title.TextColor3 = Color3.fromRGB(80, 217, 255)
+title.TextSize = 28
+title.Parent = panel
+
+local subtitle = Instance.new("TextLabel")
+subtitle.BackgroundTransparency = 1
+subtitle.Position = UDim2.new(0, 22, 0, 65)
+subtitle.Size = UDim2.new(1, -44, 0, 28)
+subtitle.Font = Enum.Font.Gotham
+subtitle.Text = "Enter your access code to continue"
+subtitle.TextColor3 = Color3.fromRGB(220, 226, 240)
+subtitle.TextSize = 14
+subtitle.Parent = panel
+
+local input = Instance.new("TextBox")
+input.Position = UDim2.new(0, 22, 0, 108)
+input.Size = UDim2.new(1, -44, 0, 44)
+input.BackgroundColor3 = Color3.fromRGB(24, 30, 44)
+input.BorderSizePixel = 0
+input.ClearTextOnFocus = false
+input.Font = Enum.Font.Gotham
+input.PlaceholderText = "ZAR-ABCDE-FGHIJ"
+input.Text = ""
+input.TextColor3 = Color3.fromRGB(255, 255, 255)
+input.PlaceholderColor3 = Color3.fromRGB(130, 145, 170)
+input.TextSize = 16
+input.Parent = panel
+Instance.new("UICorner", input).CornerRadius = UDim.new(0, 8)
+
+local redeem = Instance.new("TextButton")
+redeem.Position = UDim2.new(0, 22, 0, 166)
+redeem.Size = UDim2.new(1, -44, 0, 42)
+redeem.BackgroundColor3 = Color3.fromRGB(80, 130, 255)
+redeem.BorderSizePixel = 0
+redeem.Font = Enum.Font.GothamBold
+redeem.Text = "REDEEM ACCESS CODE"
+redeem.TextColor3 = Color3.fromRGB(255, 255, 255)
+redeem.TextSize = 14
+redeem.Parent = panel
+Instance.new("UICorner", redeem).CornerRadius = UDim.new(0, 8)
+
+local status = Instance.new("TextLabel")
+status.BackgroundTransparency = 1
+status.Position = UDim2.new(0, 22, 0, 216)
+status.Size = UDim2.new(1, -44, 0, 34)
+status.Font = Enum.Font.Gotham
+status.Text = "Access required"
+status.TextColor3 = Color3.fromRGB(160, 175, 200)
+status.TextSize = 12
+status.TextWrapped = true
+status.Parent = panel
+
+local busy = false
+redeem.Activated:Connect(function()
+    if busy then return end
+    if input.Text:match("^%s*(.-)%s*$") == "" then
+        status.Text = "Enter your access code first."
+        status.TextColor3 = Color3.fromRGB(255, 130, 150)
+        return
+    end
+
+    busy = true
+    redeem.Text = "CHECKING..."
+    status.Text = "Checking code with THE ZAR..."
+    status.TextColor3 = Color3.fromRGB(160, 210, 255)
+
+    local ok, result = pcall(function()
+        return remote:InvokeServer(input.Text)
+    end)
+
+    if ok and type(result) == "table" and result.ok == true then
+        status.Text = "Access code accepted."
+        status.TextColor3 = Color3.fromRGB(110, 235, 185)
+        task.wait(0.5)
+        gui:Destroy()
+        return
+    end
+
+    status.Text = (ok and type(result) == "table" and result.message)
+        or "Could not verify the code. Try again."
+    status.TextColor3 = Color3.fromRGB(255, 130, 150)
+    redeem.Text = "REDEEM ACCESS CODE"
+    busy = false
+end)
+
+input.FocusLost:Connect(function(enterPressed)
+    if enterPressed then redeem:Activate() end
+end)
+</textarea>
+            <div class="notice"><strong>What this code does:</strong> displays the black access-code screen and submits the entered code to Code A. <strong>What it does not do:</strong> this UI alone cannot securely block gameplay or stop an exploit from bypassing a client screen. The server-side game logic must enforce the access decision too. Test both scripts in a private server before publishing.</div>
+          </div>
           <div class="notice">These settings are saved to your website and exposed only to authenticated Roblox server scripts. The Roblox game still needs a server Script and screen LocalScript that read these settings before they can enforce the gate.</div>
         </div>
         <div class="card">

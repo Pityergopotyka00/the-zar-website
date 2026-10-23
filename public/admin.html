@@ -453,17 +453,29 @@ end
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
--- Save the game's current mouse state, then unlock it so the player can type.
+-- Save the game's current mouse state. Some FPS/camera scripts re-lock it every frame,
+-- so the access screen will actively keep it unlocked until access succeeds.
 local previousMouseBehavior = UserInputService.MouseBehavior
 local previousMouseIconEnabled = UserInputService.MouseIconEnabled
-UserInputService.MouseBehavior = Enum.MouseBehavior.Default
-UserInputService.MouseIconEnabled = true
+local mouseUnlockBound = false
 
 local function restoreMouse()
+    if mouseUnlockBound then
+        RunService:UnbindFromRenderStep("ZAR_UnlockMouse")
+        mouseUnlockBound = false
+    end
     UserInputService.MouseBehavior = previousMouseBehavior
     UserInputService.MouseIconEnabled = previousMouseIconEnabled
 end
+
+local function keepMouseUnlocked()
+    UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+    UserInputService.MouseIconEnabled = true
+end
+
+keepMouseUnlocked()
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -480,6 +492,17 @@ gui.IgnoreGuiInset = true
 gui.ResetOnSpawn = false
 gui.DisplayOrder = 100000
 gui.Parent = playerGui
+
+-- Run after normal camera scripts so they cannot re-lock the cursor while this screen is open.
+RunService:BindToRenderStep("ZAR_UnlockMouse", Enum.RenderPriority.Last.Value + 1, function()
+    if gui.Parent then
+        keepMouseUnlocked()
+    else
+        RunService:UnbindFromRenderStep("ZAR_UnlockMouse")
+        mouseUnlockBound = false
+    end
+end)
+mouseUnlockBound = true
 
 local background = Instance.new("Frame")
 background.Name = "Blackout"

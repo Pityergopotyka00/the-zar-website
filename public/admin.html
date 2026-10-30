@@ -121,6 +121,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#090e19;border:1px so
       <button data-view="game"><span class="ico">⌁</span>Game Integration</button>
       <button data-view="launch"><span class="ico">◷</span>Launch Date</button>
       <button data-view="registrations"><span class="ico">◎</span>Registrations</button>
+      <button data-view="updates"><span class="ico">✦</span>News & Updates</button>
     </nav>
     <div class="sidebar-bottom">
       <div class="admin-tag"><span class="status-dot"></span>Admin session active</div>
@@ -662,6 +663,24 @@ end)
       </div>
     </section>
 
+    <section id="view-updates" class="view">
+      <div class="two-col">
+        <div class="card">
+          <h2>Publish a transmission</h2>
+          <p class="muted">Post verified game news, event announcements, or website changes. Drafts remain private.</p>
+          <form id="updateForm">
+            <label for="newsTitle">TITLE</label><input id="newsTitle" name="title" maxlength="100" required placeholder="Development update">
+            <label for="newsCategory">CATEGORY</label><select id="newsCategory" name="category"><option>GAME</option><option>WEBSITE</option><option>EVENT</option><option>LAUNCH</option></select>
+            <label for="newsBody">MESSAGE</label><textarea id="newsBody" name="body" rows="5" maxlength="900" required placeholder="Write your confirmed update..."></textarea>
+            <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="newsPublish" style="width:auto">Publish publicly now</label>
+            <button class="btn btn-red" type="submit">Save update</button>
+          </form>
+        </div>
+        <div class="card"><h2>Transmission control</h2><p class="muted">Published messages appear on the THE ZAR homepage automatically. Unpublish any message instantly, or edit the text below.</p><div class="notice">Never announce unconfirmed launch dates, sales, or game features as released.</div></div>
+      </div>
+      <div class="card" style="margin-top:16px"><div class="section-head"><h2>Saved updates</h2><button class="btn" id="reloadUpdates">↻ Reload</button></div><div id="updatesAdminList"></div></div>
+    </section>
+
     <section id="view-registrations" class="view">
       <div class="card">
         <div class="section-head"><div><h2>Pre-registrations</h2><p>People who signed up on the public website</p></div><button class="btn" id="reloadRegs">↻ Reload</button></div>
@@ -725,7 +744,7 @@ function showView(name) {
   const titles = {
     dashboard:"Dashboard", codes:"Codes", orders:"Orders",
     giveaways:"Giveaway Codes", game:"Game Integration",
-    launch:"Launch Date", registrations:"Registrations"
+    launch:"Launch Date", registrations:"Registrations", updates:"News & Updates"
   };
   $("#pageTitle").textContent = titles[name] || "Dashboard";
   loadView(name).catch(e => toast(e.message));
@@ -768,6 +787,7 @@ async function loadView(name) {
   if (name === "launch") await loadLaunch();
   if (name === "registrations") await loadRegistrations();
   if (name === "game") await loadGame();
+  if (name === "updates") await loadUpdates();
 }
 
 async function loadDashboard() {
@@ -1087,11 +1107,49 @@ $("#toolClearActivity")?.addEventListener("click",()=>{if(!confirm("Clear the lo
 $("#toolCheckSession")?.addEventListener("click",async()=>{const out=$("#adminSessionState");out.textContent="Checking…";try{await api("/api/admin/me");out.textContent="Server confirms the admin session is valid.";zarActivity("Checked admin session");}catch(e){out.textContent="Session check failed: "+e.message;}});
 $("#toolOpenPalette")?.addEventListener("click",openZarPalette);
 function openZarPalette(){let overlay=$("#zarPaletteOverlay");if(!overlay){overlay=document.createElement("div");overlay.id="zarPaletteOverlay";overlay.className="zar-palette-overlay";overlay.innerHTML='<div class="zar-palette" role="dialog" aria-modal="true" aria-label="Command palette"><div class="eyebrow">COMMAND PALETTE</div><input id="zarPaletteSearch" placeholder="Search admin sections… (Esc to close)" autocomplete="off"><div class="muted">Use this to jump between admin pages.</div><div id="zarPaletteItems"></div></div>';overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.remove()});document.body.appendChild(overlay);const inp=$("#zarPaletteSearch");inp.addEventListener("input",renderZarPaletteItems);inp.addEventListener("keydown",e=>{if(e.key==="Escape")overlay.remove();if(e.key==="Enter")$("#zarPaletteItems button")?.click()});}renderZarPaletteItems();$("#zarPaletteSearch").focus();}
-function renderZarPaletteItems(){const q=($("#zarPaletteSearch")?.value||"").toLowerCase();const views=[["dashboard","Dashboard"],["codes","Pre-order codes"],["giveaways","Giveaway codes"],["orders","Orders"],["game","Game integration"],["launch","Launch date"],["registrations","Registrations"]].filter(v=>v[1].toLowerCase().includes(q));$("#zarPaletteItems").innerHTML=views.map(v=>'<button class="btn" data-palette-view="'+v[0]+'">'+v[1]+' ↗</button>').join("")||'<p class="muted">No matching admin section.</p>';$$("[data-palette-view]").forEach(btn=>btn.addEventListener("click",()=>{$("#zarPaletteOverlay")?.remove();showView(btn.dataset.paletteView);zarActivity("Opened "+btn.textContent.replace(" ↗","")+" using command palette")}));}
+function renderZarPaletteItems(){const q=($("#zarPaletteSearch")?.value||"").toLowerCase();const views=[["dashboard","Dashboard"],["updates","News & Updates"],["codes","Pre-order codes"],["giveaways","Giveaway codes"],["orders","Orders"],["game","Game integration"],["launch","Launch date"],["registrations","Registrations"]].filter(v=>v[1].toLowerCase().includes(q));$("#zarPaletteItems").innerHTML=views.map(v=>'<button class="btn" data-palette-view="'+v[0]+'">'+v[1]+' ↗</button>').join("")||'<p class="muted">No matching admin section.</p>';$$("[data-palette-view]").forEach(btn=>btn.addEventListener("click",()=>{$("#zarPaletteOverlay")?.remove();showView(btn.dataset.paletteView);zarActivity("Opened "+btn.textContent.replace(" ↗","")+" using command palette")}));}
 document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();if(!$("#app").classList.contains("hidden"))openZarPalette()}});
 renderZarActivity();
 
 $("#toolLaunchChecklist")?.addEventListener("click",()=>{const checklist=["THE ZAR — LAUNCH CHECKLIST","Generated: "+new Date().toLocaleString(),"","WEBSITE","[ ] Confirm latest homepage is visible on the live Cloudflare URL","[ ] Confirm launch date is intentionally set or left undecided","[ ] Submit a test registration with an email you control","[ ] Check that duplicate registration does not create duplicate records","[ ] Verify admin login and logout","[ ] Export a private admin JSON backup","[ ] Review pending orders manually; do not treat an order as paid without payment verification","[ ] Confirm access codes have correct expiry and usage limits","","ROBLOX / GAME","[ ] Confirm the correct Roblox experience is published","[ ] Set GAME_API_KEY as a Worker secret; never expose it in client code","[ ] Test server-to-server integration from a trusted server","[ ] Confirm game access rules are enforced by the game server, not just the website","","RELEASE","[ ] Test desktop and mobile layouts","[ ] Check registration and launch links","[ ] Announce only confirmed release details","[ ] Keep a rollback/backup copy"].join("\r\n");const url=URL.createObjectURL(new Blob([checklist],{type:"text/plain;charset=utf-8"}));const link=document.createElement("a");link.href=url;link.download="the-zar-launch-checklist.txt";link.click();URL.revokeObjectURL(url);toast("Launch checklist downloaded.");zarActivity("Downloaded launch checklist")});$("#toolCopySignupLink")?.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(location.origin+"/#register");toast("Pre-registration link copied.");zarActivity("Copied pre-registration link")}catch{toast("Clipboard access failed.")}});$("#toolOpenPublicSite")?.addEventListener("click",()=>window.open(location.origin,"_blank","noopener"));$("#toolExportSummary")?.addEventListener("click",async()=>{try{const [stats,settings,game]=await Promise.all([api("/api/admin/stats"),api("/api/admin/settings"),api("/api/admin/game-status")]);downloadJson("the-zar-dashboard-summary-"+new Date().toISOString().slice(0,10)+".json",{exported_at:new Date().toISOString(),stats,settings,game_status:game});zarActivity("Exported dashboard summary")}catch(e){toast(e.message)}});$("#toolClearTableSearch")?.addEventListener("click",()=>{const input=$("#toolTableSearch");if(input){input.value="";input.dispatchEvent(new Event("input"));toast("Table search cleared.")}else toast("Open the dashboard toolkit to use table search.")});
+async function loadUpdates() {
+  const data = await api("/api/admin/updates");
+  const target = $("#updatesAdminList");
+  const entries = data.updates || [];
+  target.replaceChildren();
+  if (!entries.length) { target.textContent = "No announcements yet."; return; }
+  entries.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.style.marginTop = "12px";
+    const title = document.createElement("input"); title.maxLength = 100; title.value = item.title;
+    const category = document.createElement("select");
+    ["GAME","WEBSITE","EVENT","LAUNCH"].forEach(name => {const opt=document.createElement("option");opt.value=name;opt.textContent=name;category.appendChild(opt);});
+    category.value = item.category;
+    const body = document.createElement("textarea"); body.rows=3;body.maxLength=900;body.value=item.body;body.style.marginTop="9px";
+    const status = document.createElement("label");status.style.display="flex";status.style.gap="9px";status.style.alignItems="center";
+    const checkbox=document.createElement("input");checkbox.type="checkbox";checkbox.style.width="auto";checkbox.checked=Boolean(item.is_published);
+    status.append(checkbox,document.createTextNode("Publicly published"));
+    const save=document.createElement("button");save.className="btn btn-red";save.textContent="Save changes";
+    save.addEventListener("click",async()=>{
+      try{
+        await api("/api/admin/updates/update",{method:"POST",body:JSON.stringify({id:item.id,title:title.value,category:category.value,body:body.value,published:checkbox.checked})});
+        toast("Announcement saved.");await loadUpdates();
+      }catch(e){toast(e.message);}
+    });
+    const date=document.createElement("p");date.className="muted small";date.textContent="Update #"+item.id+" · "+(item.published_at ? "Published "+dateText(item.published_at) : "Private draft");
+    card.append(date,title,category,body,status,save);target.appendChild(card);
+  });
+}
+$("#updateForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  try{
+    await api("/api/admin/updates",{method:"POST",body:JSON.stringify({title:$("#newsTitle").value,category:$("#newsCategory").value,body:$("#newsBody").value,published:$("#newsPublish").checked})});
+    event.target.reset();toast("News saved.");await loadUpdates();
+  }catch(e){toast(e.message);}
+});
+$("#reloadUpdates").addEventListener("click",()=>loadUpdates().catch(e=>toast(e.message)));
+
 (async function init() {
   try {
     await api("/api/admin/me");

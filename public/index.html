@@ -1755,6 +1755,13 @@
     <div class="roadmap-foot"><span class="status-dot"></span> ROADMAP STATUS: DATES NOT ANNOUNCED <span class="roadmap-foot-line"></span><button class="btn btn-quiet" id="roadmapRegister">GET LAUNCH UPDATES ↗</button></div>
   </div>
 </section>
+<section class="section updates-section" id="live-transmissions">
+  <div class="wrap">
+    <div class="eyebrow">THE ZAR // TRANSMISSIONS</div>
+    <div class="section-title-row"><div><h2>LATEST<br><span class="red">INTEL.</span></h2></div><p>Official announcements published by the development team.</p></div>
+    <div class="update-feed" id="zarLiveUpdates"><p>Checking for official updates…</p></div>
+  </div>
+</section>
 <section class="section updates-section" id="updates">
   <div class="wrap">
     <div class="eyebrow">TRANSMISSION LOG // WEBSITE UPDATES</div>
@@ -1987,6 +1994,32 @@
     function updateTerminalClock() { terminalClock.textContent = new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}); }
     updateTerminalClock();
     setInterval(updateTerminalClock, 30000);
+
+    // Only render published, server-approved news using textContent (never HTML).
+    async function loadPublicUpdates() {
+      const host = document.getElementById("zarLiveUpdates");
+      if (!host) return;
+      try {
+        const response = await fetch("/api/updates",{cache:"no-store"});
+        if (!response.ok) throw Error("Unavailable");
+        const data = await response.json();
+        host.replaceChildren();
+        const items = Array.isArray(data.updates) ? data.updates : [];
+        if (!items.length) { const p=document.createElement("p");p.textContent="No official transmissions have been published yet.";host.appendChild(p);return; }
+        items.forEach(item=>{
+          const article=document.createElement("article");article.className="update-entry";
+          const date=document.createElement("div");date.className="update-date";date.textContent=item.published_at?new Date(item.published_at).toLocaleDateString():"NEW";
+          const body=document.createElement("div");body.className="update-body";
+          const tag=document.createElement("div");tag.className="update-tags";
+          const span=document.createElement("span");span.textContent=item.category;tag.appendChild(span);
+          const h=document.createElement("h3");h.textContent=item.title;
+          const text=document.createElement("p");text.textContent=item.body; text.style.whiteSpace="pre-line";
+          body.append(tag,h,text);article.append(date,body);host.appendChild(article);
+        });
+      } catch { host.textContent="Official updates are temporarily unavailable."; }
+    }
+    loadPublicUpdates();
+    setInterval(loadPublicUpdates,60000);
 
     // Pre-registration: keeps the existing Cloudflare Worker endpoint.
     const form = document.getElementById("register-form");

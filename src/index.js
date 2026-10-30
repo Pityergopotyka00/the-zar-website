@@ -90,6 +90,8 @@ async function readJson(request, limit = 4096) {
 }
 
 async function ensureTables(env) {
+  await env.DB.prepare("CREATE TABLE IF NOT EXISTS registrations (email TEXT PRIMARY KEY, consent INTEGER NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();
+  await env.DB.prepare("CREATE TABLE IF NOT EXISTS zar_updates (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, body TEXT NOT NULL, category TEXT NOT NULL CHECK (category IN ('GAME','WEBSITE','EVENT','LAUNCH')), is_published INTEGER NOT NULL DEFAULT 0 CHECK (is_published IN (0,1)), published_at TEXT, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)").run();
   await env.DB.prepare(`
     CREATE TABLE IF NOT EXISTS site_settings (
       id INTEGER PRIMARY KEY CHECK (id = 1),
@@ -165,6 +167,49 @@ function cleanText(value, max = 160) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
 
+// D1-backed, atomic per-IP limits that work across Cloudflare edge instances.
+// IP addresses are never written to the database; only HMAC buckets are saved.
+async function rateLimit(env, request, action, maxHits, windowSeconds) {
+  await env.DB.prepare("CREATE TABLE IF NOT EXISTS zar_request_limits (bucket TEXT PRIMARY KEY, hits INTEGER NOT NULL, reset_at INTEGER NOT NULL)").run();
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  const secret = env.RATE_LIMIT_SECRET || env.SESSION_SECRET || env.GAME_API_KEY;
+  if (!secret) throw new Error("Rate limit secret is missing");
+  const bucket = action + ":" + base64url(await sign(action + ":" + ip, secret)).slice(0, 32);
+  const now = Math.floor(Date.now() / 1000);
+  const result = await env.DB.prepare(
+    "INSERT INTO zar_request_limits (bucket, hits, reset_at) VALUES (?,1,?) " +
+    "ON CONFLICT(bucket) DO UPDATE SET hits = CASE WHEN reset_at <= ? THEN 1 ELSE hits + 1 END, " +
+    "reset_at = CASE WHEN reset_at <= ? THEN excluded.reset_at ELSE reset_at END " +
+    "RETURNING hits, reset_at"
+  ).bind(bucket, now + windowSeconds, now, now).first();
+  if (Math.random() < 0.01) {
+    // Prune long-expired buckets without blocking normal requests on cleanup failure.
+    await env.DB.prepare("DELETE FROM zar_request_limits WHERE reset_at < ?").bind(now - 86400).run().catch(() => {});
+  }
+  return {
+    limited: Number(result?.hits ?? maxHits + 1) > maxHits,
+    retryAfter: Math.max(1, Number(result?.reset_at ?? now + windowSeconds) - now)
+  };
+}
+
+function tooManyRequests(seconds) {
+  return json({ message: "Too many requests. Try again in " + Math.ceil(seconds / 60) + " minute(s)." }, 429, {
+    "Retry-After": String(seconds)
+  });
+}
+
+function validateUpdate(data) {
+  if (!data || typeof data !== "object") return null;
+  if (typeof data.title !== "string" || typeof data.body !== "string" || typeof data.category !== "string") return null;
+  if (typeof data.published !== "boolean") return null;
+  const title = data.title.trim();
+  const body = data.body.trim();
+  const category = data.category.toUpperCase();
+  if (!title || title.length > 100 || !body || body.length > 900 ||
+      !["GAME", "WEBSITE", "EVENT", "LAUNCH"].includes(category)) return null;
+  return { title, body, category, isPublished: data.published ? 1 : 0 };
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -203,6 +248,9 @@ export default {
       if (!env.DB) return json({ message: "Registration unavailable." }, 503);
 
       try {
+        await ensureTables(env);
+        const throttle = await rateLimit(env, request, "signup", 6, 600);
+        if (throttle.limited) return tooManyRequests(throttle.retryAfter);
         await env.DB.prepare(`
           INSERT INTO registrations (email, consent)
           VALUES (?, 1) ON CONFLICT(email) DO NOTHING
@@ -210,6 +258,22 @@ export default {
         return json({ ok: true, message: "Thanks for your interest in The ZAR!" });
       } catch {
         return json({ message: "Registration unavailable." }, 503);
+      }
+    }
+
+    // Only published news is visible without an admin session.
+    if (path === "/api/updates") {
+      if (method !== "GET") return json({ message: "Method not allowed." }, 405);
+      if (!env.DB) return json({ message: "Updates unavailable." }, 503);
+      try {
+        await ensureTables(env);
+        const result = await env.DB.prepare(
+          "SELECT id, title, body, category, published_at FROM zar_updates " +
+          "WHERE is_published = 1 ORDER BY published_at DESC, id DESC LIMIT 6"
+        ).all();
+        return json({ updates: result.results || [] });
+      } catch {
+        return json({ message: "Updates unavailable." }, 503);
       }
     }
 
@@ -314,6 +378,12 @@ export default {
       }
 
       if (path === "/api/admin/login" && method === "POST") {
+        try {
+          const throttle = await rateLimit(env, request, "admin-login", 12, 900);
+          if (throttle.limited) return tooManyRequests(throttle.retryAfter);
+        } catch {
+          return json({ message: "Login temporarily unavailable." }, 503);
+        }
         let data;
         try {
           data = await readJson(request, 2048);
@@ -391,6 +461,63 @@ export default {
           return json({ total: count?.count ?? 0, registrations: result.results ?? [] });
         } catch {
           return json({ message: "Could not load registrations." }, 503);
+        }
+      }
+
+      if (path === "/api/admin/updates" && method === "GET") {
+        try {
+          const result = await env.DB.prepare(
+            "SELECT id, title, body, category, is_published, published_at, created_at, updated_at " +
+            "FROM zar_updates ORDER BY id DESC LIMIT 100"
+          ).all();
+          return json({ updates: result.results || [] });
+        } catch {
+          return json({ message: "Could not load updates." }, 503);
+        }
+      }
+
+      if (path === "/api/admin/updates" && method === "POST") {
+        let data;
+        try { data = await readJson(request, 2048); }
+        catch (e) { return json({ message: e.message || "Invalid request." }, 400); }
+        const value = validateUpdate(data);
+        if (!value) return json({ message: "Enter a title (1-100), message (1-900), category and publish choice." }, 400);
+        try {
+          const publishedAt = value.isPublished ? new Date().toISOString() : null;
+          const result = await env.DB.prepare(
+            "INSERT INTO zar_updates (title, body, category, is_published, published_at) " +
+            "VALUES (?, ?, ?, ?, ?) RETURNING id"
+          ).bind(value.title, value.body, value.category, value.isPublished, publishedAt).first();
+          return json({ ok: true, id: result.id });
+        } catch {
+          return json({ message: "Could not save update." }, 503);
+        }
+      }
+
+      if (path === "/api/admin/updates/update" && method === "POST") {
+        let data;
+        try { data = await readJson(request, 2048); }
+        catch (e) { return json({ message: e.message || "Invalid request." }, 400); }
+        const id = Number(data.id);
+        const value = validateUpdate(data);
+        if (!Number.isSafeInteger(id) || id < 1 || !value) {
+          return json({ message: "Invalid news update." }, 400);
+        }
+        try {
+          const existing = await env.DB.prepare(
+            "SELECT is_published, published_at FROM zar_updates WHERE id = ?"
+          ).bind(id).first();
+          if (!existing) return json({ message: "Update not found." }, 404);
+          const publishedAt = value.isPublished
+            ? (existing.is_published ? existing.published_at : new Date().toISOString())
+            : null;
+          await env.DB.prepare(
+            "UPDATE zar_updates SET title = ?, body = ?, category = ?, is_published = ?, " +
+            "published_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+          ).bind(value.title, value.body, value.category, value.isPublished, publishedAt, id).run();
+          return json({ ok: true });
+        } catch {
+          return json({ message: "Could not update news." }, 503);
         }
       }
 
